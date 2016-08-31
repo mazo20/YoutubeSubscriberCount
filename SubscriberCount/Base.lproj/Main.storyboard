@@ -8,10 +8,10 @@
         <capability name="Navigation items with more than one left or right bar item" minToolsVersion="7.0"/>
     </dependencies>
     <scenes>
-        <!--Subscriber Count View Controller-->
+        <!--LiveSubscriberCount-->
         <scene sceneID="tne-QT-ifu">
             <objects>
-                <viewController id="BYZ-38-t0r" customClass="SubscriberCountViewController" customModule="SubscriberCount" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController title="LiveSubscriberCount" id="BYZ-38-t0r" customClass="SubscriberCountViewController" customModule="SubscriberCount" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="y3c-jy-aDJ"/>
                         <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
@@ -37,7 +37,7 @@
                                                 <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
-                                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Icon.png" translatesAutoresizingMaskIntoConstraints="NO" id="Lsh-Ab-ulq">
+                                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Lsh-Ab-ulq">
                                                 <rect key="frame" x="220" y="0.0" width="120" height="120"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" secondItem="Lsh-Ab-ulq" secondAttribute="height" multiplier="1:1" id="Izx-rX-rSA"/>
@@ -90,20 +90,20 @@
                                         <rect key="frame" x="0.0" y="454" width="560" height="50"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="650" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="PxI-u4-JXk">
-                                                <rect key="frame" x="0.0" y="15" width="187" height="21"/>
-                                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                <rect key="frame" x="0.0" y="16" width="187" height="18"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                                 <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="9,213,124,535" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Nav-00-ymY">
-                                                <rect key="frame" x="187" y="15" width="186" height="21"/>
-                                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                <rect key="frame" x="187" y="16" width="186" height="18"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                                 <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="4,124,513" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="kRG-Qn-d5J">
-                                                <rect key="frame" x="373" y="15" width="187" height="21"/>
-                                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                <rect key="frame" x="373" y="16" width="187" height="18"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                                 <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
@@ -132,6 +132,15 @@
                             <barButtonItem systemItem="bookmarks" id="8qC-1n-Lyl"/>
                         </rightBarButtonItems>
                     </navigationItem>
+                    <connections>
+                        <outlet property="channelNameLabel" destination="QJS-OM-rRQ" id="4u1-zX-yTq"/>
+                        <outlet property="liveSubscriberCountLabel" destination="rC2-RI-HtT" id="kgJ-mG-HhR"/>
+                        <outlet property="searchTextField" destination="jUU-cx-RU7" id="D19-7s-heI"/>
+                        <outlet property="stuckSubscriberCountLabel" destination="kRG-Qn-d5J" id="why-rr-kEv"/>
+                        <outlet property="thumbnailImageView" destination="Lsh-Ab-ulq" id="BFm-6J-fPO"/>
+                        <outlet property="videoCountLabel" destination="PxI-u4-JXk" id="gxo-TH-4Jh"/>
+                        <outlet property="viewsCountLabel" destination="Nav-00-ymY" id="MVF-RA-n3n"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
@@ -157,7 +166,6 @@
         </scene>
     </scenes>
     <resources>
-        <image name="Icon.png" width="60" height="60"/>
         <image name="Video Call Filled-100-2.png" width="100" height="100"/>
         <image name="Visible-100-2.png" width="100" height="100"/>
         <image name="YouTube-100-2.png" width="100" height="100"/>

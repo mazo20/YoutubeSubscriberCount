@@ -22,6 +22,7 @@
 		548890421D75A76F00C69B72 /* YouTube-100-2.png in Resources */ = {isa = PBXBuildFile; fileRef = 5488903C1D75A76F00C69B72 /* YouTube-100-2.png */; };
 		548890431D75A76F00C69B72 /* YouTube-100.png in Resources */ = {isa = PBXBuildFile; fileRef = 5488903D1D75A76F00C69B72 /* YouTube-100.png */; };
 		548890451D75AED700C69B72 /* YoutubeAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 548890441D75AED700C69B72 /* YoutubeAPI.swift */; };
+		548890491D76DB5D00C69B72 /* SubscriberProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 548890481D76DB5D00C69B72 /* SubscriberProfile.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -42,6 +43,7 @@
 		5488903C1D75A76F00C69B72 /* YouTube-100-2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "YouTube-100-2.png"; sourceTree = "<group>"; };
 		5488903D1D75A76F00C69B72 /* YouTube-100.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "YouTube-100.png"; sourceTree = "<group>"; };
 		548890441D75AED700C69B72 /* YoutubeAPI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = YoutubeAPI.swift; sourceTree = "<group>"; };
+		548890481D76DB5D00C69B72 /* SubscriberProfile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubscriberProfile.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -79,6 +81,7 @@
 				548890101D755EA300C69B72 /* Main.storyboard */,
 				5488901E1D7560C200C69B72 /* SubscriberCountView.swift */,
 				548890201D7562CD00C69B72 /* SubscriberCountViewController.swift */,
+				548890481D76DB5D00C69B72 /* SubscriberProfile.swift */,
 				548890441D75AED700C69B72 /* YoutubeAPI.swift */,
 				5488902E1D759FDD00C69B72 /* Icon@3x.png */,
 				548890381D75A76F00C69B72 /* Video Call Filled-100-2.png */,
@@ -174,6 +177,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5488900F1D755EA300C69B72 /* ViewController.swift in Sources */,
+				548890491D76DB5D00C69B72 /* SubscriberProfile.swift in Sources */,
 				5488901F1D7560C200C69B72 /* SubscriberCountView.swift in Sources */,
 				548890451D75AED700C69B72 /* YoutubeAPI.swift in Sources */,
 				548890211D7562CD00C69B72 /* SubscriberCountViewController.swift in Sources */,
