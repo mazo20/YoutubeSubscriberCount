@@ -132,24 +132,30 @@ struct YoutubeAPI {
     }
     
     static func idForName(name: String, completionHandler: (Result) -> Void ){
-        let url = youtubeURL(method: .Search, part: ["snippet"], parameters: ["q": name, "type": "channel"])
-        jsonSerialization(url, completionHandler: { dataResult -> Void in
-            switch dataResult {
-            case let .Success(result):
-                if let pageInfo = result["pageInfo"] as? NSDictionary,
-                    totalResults = pageInfo["totalResults"] as? Int where totalResults > 0,
-                    let items = result["items"] as? [[String:AnyObject]] where items.count > 0,
-                    let snippet = items[0]["snippet"] as? NSDictionary,
-                    id = snippet["channelId"] as? String {
-                    completionHandler(.Success(id))
-                } else {
+        if name.characters.count == 24 {
+            print("ID already known")
+            completionHandler(.Success(name))
+            
+        } else {
+            let url = youtubeURL(method: .Search, part: ["snippet"], parameters: ["q": name, "type": "channel"])
+            jsonSerialization(url, completionHandler: { dataResult -> Void in
+                switch dataResult {
+                case let .Success(result):
+                    if let pageInfo = result["pageInfo"] as? NSDictionary,
+                        totalResults = pageInfo["totalResults"] as? Int where totalResults > 0,
+                        let items = result["items"] as? [[String:AnyObject]] where items.count > 0,
+                        let snippet = items[0]["snippet"] as? NSDictionary,
+                        id = snippet["channelId"] as? String {
+                        completionHandler(.Success(id))
+                    } else {
+                        completionHandler(.Failure(Error.IDError))
+                    }
+                case let .Failure(error):
+                    print(error)
                     completionHandler(.Failure(Error.IDError))
                 }
-            case let .Failure(error):
-                print(error)
-                completionHandler(.Failure(Error.IDError))
-            }
-        })
+            })
+        }
     }
     
     static func jsonSerialization(url: NSURL, completionHandler: (Result) -> Void) {
@@ -170,13 +176,12 @@ struct YoutubeAPI {
     }
     
     static func fetchAllData(forName: String, completionHandler: (Result) -> Void) {
-        var image: UIImage?
-        var data = [String]()
+        var subscriberDictionary = [String: AnyObject]()
         YoutubeAPI.idForName(forName, completionHandler: { idResult -> Void in
             switch idResult {
             case let .Success(result):
                 let id = result as! String
-                publicId = id
+                subscriberDictionary["id"] = id
                 let group = dispatch_group_create()
                 dispatch_group_enter(group)
                 YoutubeAPI.photoForId(id, completionHandler: { photoResult -> Void in
@@ -184,7 +189,7 @@ struct YoutubeAPI {
                     case let .Success(result):
                         let url = NSURL(string: result as! String)
                         let imageData = NSData(contentsOfURL: url!)
-                        image = UIImage(data: imageData!)
+                        subscriberDictionary["image"] = UIImage(data: imageData!)
                         dispatch_group_leave(group)
                     case let .Failure(error):
                         print(error)
@@ -196,10 +201,10 @@ struct YoutubeAPI {
                     switch dataResult {
                     case let .Success(result):
                         if let array = result as? [String] {
-                            data.append(array[1])
-                            data.append(array[0])
-                            data.append(array[3])
-                            data.append(array[2])
+                            subscriberDictionary["liveSubscriberCount"] = array[1]
+                            subscriberDictionary["channelName"] = array[0]
+                            subscriberDictionary["videosCount"] = array[3]
+                            subscriberDictionary["viewsCount"] = array[2]
                             dispatch_group_leave(group)
                         }
                     case let .Failure(error):
@@ -211,7 +216,7 @@ struct YoutubeAPI {
                 YoutubeAPI.stuckSubscriberCountForId(id, completionHandler: { subsResult -> Void in
                     switch subsResult {
                     case let .Success(result):
-                        data.append(result as! String)
+                        subscriberDictionary["stuckSubscriberCount"] = result as! String
                         dispatch_group_leave(group)
                     case let .Failure(error):
                         print(error)
@@ -220,12 +225,13 @@ struct YoutubeAPI {
                     
                 })
                 dispatch_group_notify(group, dispatch_get_main_queue()) {
-                    if data.count == 4 {
-                        data.append(data[0])
+                    if subscriberDictionary["stuckSubscriberCount"] == nil {
+                        if let live = subscriberDictionary["liveSubscriberCount"] as? String {
+                            subscriberDictionary["stuckSubscriberCount"] = live
+                        }
                     }
-                    if data.count == 5 {
-                        let sub = SubscriberProfile(image: image, liveSubscriberCount: data[0], channelName: data[1], videosCount: data[2], viewsCount: data[3], stuckSubscriberCount: data[4], id: id)
-                        completionHandler(.Success(sub))
+                    if subscriberDictionary.count == 7 {
+                        completionHandler(.Success(subscriberDictionary))
                     } else {
                         completionHandler(.Failure(Error.ConstructingError))
                     }
@@ -237,17 +243,16 @@ struct YoutubeAPI {
         })
     }
     static func fetchSomeData(id: String, completionHandler: (Result) -> Void ){
-        var data = [String]()
         YoutubeAPI.dataForId(id, completionHandler: { dataResult -> Void in
             switch dataResult {
             case let .Success(result):
                 if let array = result as? [String] {
-                    data.append(array[1])
-                    data.append(array[0])
-                    data.append(array[3])
-                    data.append(array[2])
-                    let sub = SubscriberProfile(image: nil, liveSubscriberCount: data[0], channelName: data[1], videosCount: data[2], viewsCount: data[3], stuckSubscriberCount: nil, id: nil)
-                    completionHandler(.Success(sub))
+                    var subscriberDictionary = [String: AnyObject]()
+                    subscriberDictionary["liveSubscriberCount"] = array[1]
+                    subscriberDictionary["channelName"] = array[0]
+                    subscriberDictionary["videosCount"] = array[3]
+                    subscriberDictionary["viewsCount"] = array[2]
+                    completionHandler(.Success(subscriberDictionary))
                 }
             case let .Failure(error):
                 print(error)
@@ -255,5 +260,15 @@ struct YoutubeAPI {
             }
         })
     }
-    
+    static func fetchStuckSubscriberCount(id: String, completionHandler: (Result) -> Void ){
+        YoutubeAPI.stuckSubscriberCountForId(id, completionHandler: { subsResult -> Void in
+            switch subsResult {
+            case let .Success(result):
+                completionHandler(.Success(result))
+            case let .Failure(error):
+                print(error)
+                completionHandler(.Failure(Error.StuckSubError))
+            }
+        })
+    }
 }

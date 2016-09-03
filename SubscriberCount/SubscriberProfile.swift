@@ -8,36 +8,27 @@
 
 import UIKit
 
-class SubscriberProfile: NSObject {
+class SubscriberProfile: NSObject, NSCoding {
     
-    var image: UIImage?
-    var liveSubscriberCount: String!
+    var image: UIImage!
     var channelName: String!
-    var videosCount: String!
-    var viewsCount: String!
-    var stuckSubscriberCount: String?
-    var id: String?
+    var id: String!
     
-    init(image: UIImage?, liveSubscriberCount: String, channelName: String, videosCount: String, viewsCount: String, stuckSubscriberCount: String?, id: String?) {
-        if let img = image {
-            self.image = img
-        }
-        
-        self.liveSubscriberCount = liveSubscriberCount
+    init(image: UIImage, channelName: String, id: String) {
+        self.image = image
         self.channelName = channelName
-        self.videosCount = videosCount
-        self.viewsCount = viewsCount
-        if let idString = id {
-            self.id = idString
-        }
-        if let stuck = stuckSubscriberCount {
-            self.stuckSubscriberCount = stuck
-        } else {
-            self.stuckSubscriberCount = liveSubscriberCount
-        }
-        
-        super.init()
+        self.id = id
     }
     
+    func encodeWithCoder(aCoder: NSCoder) {
+        aCoder.encodeObject(channelName, forKey: "channelName")
+        aCoder.encodeObject(image, forKey: "image")
+        aCoder.encodeObject(id, forKey: "id")
+    }
+    required init?(coder aDecoder: NSCoder) {
+        image = aDecoder.decodeObjectForKey("image") as! UIImage
+        channelName = aDecoder.decodeObjectForKey("channelName") as! String
+        id = aDecoder.decodeObjectForKey("id") as! String
+    }
     
 }
