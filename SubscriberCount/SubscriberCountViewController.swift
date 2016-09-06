@@ -27,9 +27,11 @@ class SubscriberCountViewController: UIViewController, UITextFieldDelegate, Send
     let imageView = UIImageView()
     let visualEffect = UIVisualEffectView()
     var loadingAnimation: NVActivityIndicatorView!
-    var label: UILabel!
+    var repeatLabel: UILabel!
+    var noIDLabel: UILabel!
     var timer: NSTimer!
-    
+    var repeatButton: UIButton!
+    var name = ""
     
     override func viewDidLoad() {
         stackView.hidden = true
@@ -46,19 +48,43 @@ class SubscriberCountViewController: UIViewController, UITextFieldDelegate, Send
         searchTextField.clearButtonMode = .WhileEditing
         searchTextField.clearsOnBeginEditing = true
         
-        let frame = CGRect(origin: CGPointZero, size: CGSize(width: 70, height: 70))
+        var frame = CGRect(origin: CGPointZero, size: CGSize(width: 70, height: 70))
         loadingAnimation = NVActivityIndicatorView(frame: frame, type: .BallPulse, color: UIColor.blackColor(), padding: nil)
         loadingAnimation.center = self.view.center
         self.view.addSubview(loadingAnimation)
         loadingAnimation.hidesWhenStopped = true
         loadingAnimation.startAnimation()
         
-        label = UILabel(frame: frame)
-        label.text = "Problem with internet conneciton"
-        label.center = self.view.center
-        self.view.addSubview(label)
-        label.hidden = true
         
+        repeatButton = UIButton(frame: frame)
+        repeatButton.addTarget(self, action: #selector(self.update), forControlEvents: .TouchUpInside)
+        repeatButton.center = self.view.center
+        repeatButton.center.y+=150
+        repeatButton.setImage(UIImage(imageLiteral: "Synchronize.png"), forState: .Normal)
+        self.view.addSubview(repeatButton)
+        
+        frame = CGRect(origin: CGPointZero, size: CGSize(width: 320, height: 100))
+        repeatLabel = UILabel(frame: frame)
+        repeatLabel.text = "Oops!\nSomething went wrong"
+        repeatLabel.font = repeatLabel.font.fontWithSize(20)
+        repeatLabel.numberOfLines = 3
+        repeatLabel.center = self.view.center
+        repeatLabel.center.y-=50
+        repeatLabel.textAlignment = .Center
+        self.view.addSubview(repeatLabel)
+        noIDLabel = UILabel(frame: frame)
+        noIDLabel.text = "No channel found!\nSearch for something else"
+        noIDLabel.font = noIDLabel.font.fontWithSize(20)
+        noIDLabel.numberOfLines = 3
+        noIDLabel.center = self.view.center
+        noIDLabel.textAlignment = .Center
+        self.view.addSubview(noIDLabel)
+        
+        shouldShowError(false)
+        
+        searchTextField.layer.borderColor = UIColor.blackColor().CGColor
+        searchTextField.layer.borderWidth = 1
+        searchTextField.layer.cornerRadius = 5
         
         visualEffect.frame = self.view.bounds
         visualEffect.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
@@ -69,52 +95,37 @@ class SubscriberCountViewController: UIViewController, UITextFieldDelegate, Send
         self.view.addSubview(visualEffect)
         self.view.sendSubviewToBack(visualEffect)
         self.view.sendSubviewToBack(imageView)
-        let blurEffect = UIBlurEffect(style: UIBlurEffectStyle.Light)
-        visualEffect.effect = blurEffect
+        visualEffect.effect = UIBlurEffect(style: UIBlurEffectStyle.Light)
         
-        self.thumbnailImageView.layer.cornerRadius = 10
-        self.thumbnailImageView.clipsToBounds = true
+        thumbnailImageView.layer.cornerRadius = 10
+        thumbnailImageView.layer.borderWidth = 1
+        thumbnailImageView.layer.borderColor = UIColor.blackColor().CGColor
+        thumbnailImageView.clipsToBounds = true
+        
         timer = NSTimer.scheduledTimerWithTimeInterval(1, target: self, selector: #selector(self.updateLiveSubscriberCount), userInfo: nil, repeats: true)
-        _ = NSTimer.scheduledTimerWithTimeInterval(20, target: self, selector: #selector(self.updateStuckSubscriberCount), userInfo: nil, repeats: true)
+        _ = NSTimer.scheduledTimerWithTimeInterval(30, target: self, selector: #selector(self.updateStuckSubscriberCount), userInfo: nil, repeats: true)
+        
         if store.store.count > 0 {
-            let index = random()%store.store.count
-            newProfile(store.store[index].id)
+            let index = Int(arc4random_uniform(UInt32(store.store.count)))
+            newProfile(withName: store.store[index].id)
         } else {
-            newProfile(publicId)
+            newProfile(withName: publicId)
         }
         
-    }
-    override func viewWillAppear(animated: Bool) {
-        var hasProfile = false
-        for profile in self.store.store {
-            if profile.id == publicId {
-                hasProfile = true
-                break
-            }
-        }
-        if !hasProfile {
-            self.bookmarkButton.image = UIImage(imageLiteral: "Bookmark_Empty.png")
-        }
     }
     
-    func textFieldShouldReturn(textField: UITextField) -> Bool {
-        textField.resignFirstResponder()
-        newProfile(textField.text!)
-        return false
+    override func viewWillAppear(animated: Bool) {
+        updateBookmark()
     }
+    
     @IBAction func shareButton(sender: AnyObject) {
         let firstActivityItem = NSURL(string: "https://itunes.apple.com/bh/app/facebook/id284882215?mt=8")!
         
         let activityViewController = UIActivityViewController(activityItems: [firstActivityItem], applicationActivities: nil)
-        
-        // This lines is for the popover you need to show in iPad
         activityViewController.popoverPresentationController?.sourceView = (sender as! UIButton)
-        
-        // This line remove the arrow of the popover to show in iPad
         activityViewController.popoverPresentationController?.permittedArrowDirections = UIPopoverArrowDirection()
         activityViewController.popoverPresentationController?.sourceRect = CGRect(x: 150, y: 150, width: 0, height: 0)
         
-        // Anything you want to exclude
         activityViewController.excludedActivityTypes = [
             UIActivityTypePostToWeibo,
             UIActivityTypeMail,
@@ -129,91 +140,96 @@ class SubscriberCountViewController: UIViewController, UITextFieldDelegate, Send
         ]
         self.presentViewController(activityViewController, animated: true, completion: nil)
     }
+    
     @IBAction func saveProfile(sender: AnyObject) {
-        var hasProfile = false
-        for profile in self.store.store {
-            if profile.id == publicId {
-                hasProfile = true
-                let index = store.store.indexOf(profile)
-                store.store.removeAtIndex(index!)
-                self.bookmarkButton.image = UIImage(imageLiteral: "Bookmark_Empty.png")
-                break
-            }
+        if self.repeatLabel.hidden {
+            updateBookmark(true)
         }
-        if !hasProfile {
-            let subscriberProfile = SubscriberProfile(image: self.thumbnailImageView.image!, channelName: self.channelNameLabel.text!, id: publicId)
-            self.store.store.append(subscriberProfile)
-            self.bookmarkButton.image = UIImage(imageLiteral: "Bookmark_Filled.png")
-        }
-        
     }
     
-    func newProfile(name: String) {
+    func textFieldShouldReturn(textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        name = textField.text!
+        newProfile(withName: name)
+        return false
+    }
+    
+    func updateBookmark(changeState: Bool? = nil) {
+        let profileInStore = self.store.store.filter{$0.id == publicId}.first
+        if let profileInStore = profileInStore {
+            if let _ = changeState {
+                let index = self.store.store.indexOf(profileInStore)
+                self.store.store.removeAtIndex(index!)
+                self.bookmarkButton.image = UIImage(imageLiteral: "Bookmark_Empty.png")
+            } else {
+                self.bookmarkButton.image = UIImage(imageLiteral: "Bookmark_Filled.png")
+            }
+            
+        } else {
+            if let _ = changeState {
+                let subscriberProfile = SubscriberProfile(image: self.thumbnailImageView.image!, channelName: self.channelNameLabel.text!, id: publicId)
+                self.store.store.append(subscriberProfile)
+                self.bookmarkButton.image = UIImage(imageLiteral: "Bookmark_Filled.png")
+            } else {
+                self.bookmarkButton.image = UIImage(imageLiteral: "Bookmark_Empty.png")
+            }
+        }
+    }
+    
+    func shouldShowError(isTrue: Bool, error: Error? = nil) {
+        if isTrue {
+            if let errorType = error {
+                switch errorType {
+                case .IDError:
+                    self.noIDLabel.hidden = false
+                default:
+                    self.repeatLabel.hidden = false
+                    self.repeatButton.hidden = false
+                }
+            }
+        } else {
+            self.repeatLabel.hidden = true
+            self.repeatButton.hidden = true
+            self.noIDLabel.hidden = true
+        }
+    }
+    
+    func update() {
+        newProfile(withName: name)
+        shouldShowError(false)
+    }
+    
+    func newProfile(withName name: String) {
+        shouldShowError(false)
         self.stackView.hidden = true
         loadingAnimation.startAnimation()
         timer.invalidate()
-        YoutubeAPI.fetchAllData(name, completionHandler: { result -> Void in
+        YoutubeAPI.parseAllData(name, completionHandler: { result -> Void in
             switch result {
             case let .Success(result):
                 dispatch_async(dispatch_get_main_queue()) {
-                    let subscriberDictionary = result as! [String: AnyObject]
-                    if let channel = subscriberDictionary["channelName"] as? String, liveSubCount = subscriberDictionary["liveSubscriberCount"] as? String, views = subscriberDictionary["viewsCount"] as? String, videos = subscriberDictionary["videosCount"] as? String, image = subscriberDictionary["image"] as? UIImage, stuckSubCount = subscriberDictionary["stuckSubscriberCount"] as? String {
-                        self.imageView.image = image
-                        self.thumbnailImageView.image = image
-                        self.channelNameLabel.text = channel
-                        self.liveSubscriberCountLabel.text = liveSubCount
-                        self.viewsCountLabel.text = views
-                        self.videoCountLabel.text = videos
-                        self.stuckSubscriberCountLabel.text = stuckSubCount
-                        
-                        publicId = subscriberDictionary["id"] as! String
-                        
-                        var hasProfile = false
-                        for profile in self.store.store {
-                            if profile.id == publicId {
-                                hasProfile = true
-                                break
-                            }
-                        }
-                        if hasProfile {
-                            self.bookmarkButton.image = UIImage(imageLiteral: "Bookmark_Filled.png")
-                        } else {
-                            self.bookmarkButton.image = UIImage(imageLiteral: "Bookmark_Empty.png")
-                        }
-                        
-                        self.stackView.hidden = false
-                        self.loadingAnimation.stopAnimation()
-                        self.timer = NSTimer.scheduledTimerWithTimeInterval(1, target: self, selector: #selector(self.updateLiveSubscriberCount), userInfo: nil, repeats: true)
-                    } else {
-                        self.stackView.hidden = false
-                        self.loadingAnimation.stopAnimation()
-                        self.timer = NSTimer.scheduledTimerWithTimeInterval(1, target: self, selector: #selector(self.updateLiveSubscriberCount), userInfo: nil, repeats: true)
-                    }
+                    self.updateView(withValues: result as! [String: AnyObject])
+                    self.updateBookmark()
+                    self.stackView.hidden = false
+                    self.timer = NSTimer.scheduledTimerWithTimeInterval(1, target: self, selector: #selector(self.updateLiveSubscriberCount), userInfo: nil, repeats: true)
+                    self.loadingAnimation.stopAnimation()
                 }
             case let .Failure(error):
                 print(error)
+                let errorType = error as! Error
                 dispatch_async(dispatch_get_main_queue()) {
-                    self.stackView.hidden = false
+                    self.shouldShowError(true, error: errorType)
                     self.loadingAnimation.stopAnimation()
-                    //self.timer = NSTimer.scheduledTimerWithTimeInterval(1, target: self, selector: #selector(self.updateLiveSubscriberCount), userInfo: nil, repeats: true)
                 }
             }
         })
     }
     
     func updateLiveSubscriberCount() {
-        YoutubeAPI.fetchSomeData(publicId, completionHandler: { result -> Void in
+        YoutubeAPI.parseData(forID: publicId, parameters: [.Data], completionHandler: { result -> Void in
             switch result {
             case let .Success(result):
-                dispatch_async(dispatch_get_main_queue()) {
-                    let subscriberDictionary = result as! [String: AnyObject]
-                    if let channel = subscriberDictionary["channelName"] as? String, liveSubCount = subscriberDictionary["liveSubscriberCount"] as? String, views = subscriberDictionary["viewsCount"] as? String, videos = subscriberDictionary["videosCount"] as? String {
-                        self.channelNameLabel.text = channel
-                        self.liveSubscriberCountLabel.text = liveSubCount
-                        self.viewsCountLabel.text = views
-                        self.videoCountLabel.text = videos
-                    }
-                }
+                self.updateView(withValues: result as! [String: AnyObject])
             case let .Failure(error):
                 print(error)
             }
@@ -221,14 +237,27 @@ class SubscriberCountViewController: UIViewController, UITextFieldDelegate, Send
     }
     
     func updateStuckSubscriberCount() {
-        YoutubeAPI.fetchStuckSubscriberCount(publicId, completionHandler: { result -> Void in
+        YoutubeAPI.parseData(forID: publicId, parameters: [.StuckSubscriberCount], completionHandler: { result -> Void in
             switch result {
             case let .Success(result):
-                self.stuckSubscriberCountLabel.text = (result as! String)
+                self.updateView(withValues: result as! [String: AnyObject])
             case let .Failure(error):
                 print(error)
             }
         })
+    }
+    
+    func updateView(withValues values: [String: AnyObject]) {
+        if let channel = values["channelName"] as? String  { self.channelNameLabel.text = channel }
+        if let liveSubCount = values["liveSubscriberCount"] as? String { self.liveSubscriberCountLabel.text = liveSubCount }
+        if let stuckSubCount = values["stuckSubscriberCount"] as? String { self.stuckSubscriberCountLabel.text = stuckSubCount }
+        if let views = values["viewsCount"] as? String { self.viewsCountLabel.text = views }
+        if let videos = values["videosCount"] as? String { self.videoCountLabel.text = videos }
+        if let id = values["id"] as? String { publicId = id }
+        if let image = values["image"] as? UIImage {
+            self.imageView.image = image
+            self.thumbnailImageView.image = image
+        }
     }
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
@@ -237,24 +266,10 @@ class SubscriberCountViewController: UIViewController, UITextFieldDelegate, Send
             let bookmarksViewController = navController.topViewController as! BookmarksTableViewController
             bookmarksViewController.store = self.store
             bookmarksViewController.delegate = self
-            
         }
     }
     
     func sendData(data: String) {
-        newProfile(data)
-    }
-}
-
-class SubscriberNavigationController: UINavigationController {
-    
-    var statusBarStyle: UIStatusBarStyle = .Default {
-        didSet {
-            preferredStatusBarStyle()
-        }
-    }
-    
-    override func preferredStatusBarStyle() -> UIStatusBarStyle {
-        return statusBarStyle
+        newProfile(withName: data)
     }
 }

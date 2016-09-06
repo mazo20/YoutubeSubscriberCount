@@ -25,6 +25,7 @@ class SubscriberProfile: NSObject, NSCoding {
         aCoder.encodeObject(image, forKey: "image")
         aCoder.encodeObject(id, forKey: "id")
     }
+    
     required init?(coder aDecoder: NSCoder) {
         image = aDecoder.decodeObjectForKey("image") as! UIImage
         channelName = aDecoder.decodeObjectForKey("channelName") as! String

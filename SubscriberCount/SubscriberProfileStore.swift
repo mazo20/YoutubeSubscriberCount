@@ -9,7 +9,9 @@
 import UIKit
 
 class SubscriberProfileStore: NSObject {
+    
     var store = [SubscriberProfile]()
+    
     let profilesArchiveURL: NSURL = {
         let documentsDirectories = NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask)
         let documentDirectory = documentsDirectories.first!

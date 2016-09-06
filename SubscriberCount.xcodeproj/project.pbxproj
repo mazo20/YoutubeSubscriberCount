@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		542366C01D7AFA1C00B823E4 /* Synchronize.png in Resources */ = {isa = PBXBuildFile; fileRef = 542366BF1D7AFA1C00B823E4 /* Synchronize.png */; };
 		5488900D1D755EA300C69B72 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5488900C1D755EA300C69B72 /* AppDelegate.swift */; };
-		5488900F1D755EA300C69B72 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5488900E1D755EA300C69B72 /* ViewController.swift */; };
 		548890121D755EA300C69B72 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 548890101D755EA300C69B72 /* Main.storyboard */; };
 		548890141D755EA300C69B72 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 548890131D755EA300C69B72 /* Assets.xcassets */; };
 		548890171D755EA300C69B72 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 548890151D755EA300C69B72 /* LaunchScreen.storyboard */; };
@@ -67,14 +67,14 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		542366BF1D7AFA1C00B823E4 /* Synchronize.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Synchronize.png; sourceTree = "<group>"; };
 		548890091D755EA300C69B72 /* SubscriberCount.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SubscriberCount.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5488900C1D755EA300C69B72 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		5488900E1D755EA300C69B72 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		548890111D755EA300C69B72 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		548890131D755EA300C69B72 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		548890161D755EA300C69B72 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		548890181D755EA300C69B72 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		548890201D7562CD00C69B72 /* SubscriberCountViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubscriberCountViewController.swift; sourceTree = "<group>"; };
+		548890201D7562CD00C69B72 /* SubscriberCountViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubscriberCountViewController.swift; sourceTree = "<group>"; usesTabs = 0; };
 		548890381D75A76F00C69B72 /* Video Call Filled-100-2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Video Call Filled-100-2.png"; sourceTree = "<group>"; };
 		548890391D75A76F00C69B72 /* Video Call Filled-100-3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Video Call Filled-100-3.png"; sourceTree = "<group>"; };
 		5488903A1D75A76F00C69B72 /* Visible-100-2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Visible-100-2.png"; sourceTree = "<group>"; };
@@ -159,16 +159,16 @@
 			isa = PBXGroup;
 			children = (
 				5488900C1D755EA300C69B72 /* AppDelegate.swift */,
-				5488900E1D755EA300C69B72 /* ViewController.swift */,
-				548890101D755EA300C69B72 /* Main.storyboard */,
 				54FA8D291D785F4000570D61 /* BookmarksTableViewController.swift */,
 				54FA8D2B1D785FCE00570D61 /* SubscriberCell.swift */,
 				548890441D75AED700C69B72 /* YoutubeAPI.swift */,
 				548890201D7562CD00C69B72 /* SubscriberCountViewController.swift */,
 				548890481D76DB5D00C69B72 /* SubscriberProfile.swift */,
 				54FA8D2D1D787C5900570D61 /* SubscriberProfileStore.swift */,
+				548890101D755EA300C69B72 /* Main.storyboard */,
 				54FA8D421D78BAD900570D61 /* NVActivityIndicatorView */,
 				54FA8D311D789C3D00570D61 /* BarButtonIcons */,
+				542366BF1D7AFA1C00B823E4 /* Synchronize.png */,
 				548890381D75A76F00C69B72 /* Video Call Filled-100-2.png */,
 				548890391D75A76F00C69B72 /* Video Call Filled-100-3.png */,
 				5488903A1D75A76F00C69B72 /* Visible-100-2.png */,
@@ -313,6 +313,7 @@
 				548890431D75A76F00C69B72 /* YouTube-100.png in Resources */,
 				5488903F1D75A76F00C69B72 /* Video Call Filled-100-3.png in Resources */,
 				5488903E1D75A76F00C69B72 /* Video Call Filled-100-2.png in Resources */,
+				542366C01D7AFA1C00B823E4 /* Synchronize.png in Resources */,
 				548890411D75A76F00C69B72 /* Visible-100.png in Resources */,
 				548890121D755EA300C69B72 /* Main.storyboard in Resources */,
 				54FA8D371D789DA600570D61 /* Bookmark_Empty@2x.png in Resources */,
@@ -327,7 +328,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				54FA8D7C1D78BAD900570D61 /* NVActivityIndicatorAnimationBallZigZag.swift in Sources */,
-				5488900F1D755EA300C69B72 /* ViewController.swift in Sources */,
 				54FA8D7E1D78BAD900570D61 /* NVActivityIndicatorAnimationBlank.swift in Sources */,
 				54FA8D8C1D78BAD900570D61 /* NVActivityIndicatorShape.swift in Sources */,
 				54FA8D7A1D78BAD900570D61 /* NVActivityIndicatorAnimationBallSpinFadeLoader.swift in Sources */,
