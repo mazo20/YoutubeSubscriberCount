@@ -8,7 +8,10 @@
 
 import UIKit
 
-public var publicId = "UCtinbF-Q-fVthA0qrFQTgXQ"
+//public var publicId = "UCtinbF-Q-fVthA0qrFQTgXQ"
+public struct Public {
+    static var id = "UC-lHJZR3Gqxm24_Vd_AJ5Yw"
+}
 
 class SubscriberCountViewController: UIViewController, UITextFieldDelegate, SendIdDelegate {
     
@@ -96,7 +99,7 @@ class SubscriberCountViewController: UIViewController, UITextFieldDelegate, Send
         self.view.sendSubviewToBack(visualEffect)
         self.view.sendSubviewToBack(imageView)
         visualEffect.effect = UIBlurEffect(style: UIBlurEffectStyle.Light)
-        
+       
         thumbnailImageView.layer.cornerRadius = 10
         thumbnailImageView.layer.borderWidth = 1
         thumbnailImageView.layer.borderColor = UIColor.blackColor().CGColor
@@ -109,7 +112,7 @@ class SubscriberCountViewController: UIViewController, UITextFieldDelegate, Send
             let index = Int(arc4random_uniform(UInt32(store.store.count)))
             newProfile(withName: store.store[index].id)
         } else {
-            newProfile(withName: publicId)
+            newProfile(withName: Public.id)
         }
         
     }
@@ -119,7 +122,7 @@ class SubscriberCountViewController: UIViewController, UITextFieldDelegate, Send
     }
     
     @IBAction func shareButton(sender: AnyObject) {
-        let firstActivityItem = NSURL(string: "https://itunes.apple.com/bh/app/facebook/id284882215?mt=8")!
+        let firstActivityItem = "To be added"
         
         let activityViewController = UIActivityViewController(activityItems: [firstActivityItem], applicationActivities: nil)
         activityViewController.popoverPresentationController?.sourceView = (sender as! UIButton)
@@ -155,7 +158,7 @@ class SubscriberCountViewController: UIViewController, UITextFieldDelegate, Send
     }
     
     func updateBookmark(changeState: Bool? = nil) {
-        let profileInStore = self.store.store.filter{$0.id == publicId}.first
+        let profileInStore = self.store.store.filter{$0.id == Public.id}.first
         if let profileInStore = profileInStore {
             if let _ = changeState {
                 let index = self.store.store.indexOf(profileInStore)
@@ -167,7 +170,7 @@ class SubscriberCountViewController: UIViewController, UITextFieldDelegate, Send
             
         } else {
             if let _ = changeState {
-                let subscriberProfile = SubscriberProfile(image: self.thumbnailImageView.image!, channelName: self.channelNameLabel.text!, id: publicId)
+                let subscriberProfile = SubscriberProfile(image: self.thumbnailImageView.image!, channelName: self.channelNameLabel.text!, id: Public.id)
                 self.store.store.append(subscriberProfile)
                 self.bookmarkButton.image = UIImage(imageLiteral: "Bookmark_Filled.png")
             } else {
@@ -226,7 +229,7 @@ class SubscriberCountViewController: UIViewController, UITextFieldDelegate, Send
     }
     
     func updateLiveSubscriberCount() {
-        YoutubeAPI.parseData(forID: publicId, parameters: [.Data], completionHandler: { result -> Void in
+        YoutubeAPI.parseData(forID: Public.id, parameters: [.Data], completionHandler: { result -> Void in
             switch result {
             case let .Success(result):
                 self.updateView(withValues: result as! [String: AnyObject])
@@ -237,7 +240,7 @@ class SubscriberCountViewController: UIViewController, UITextFieldDelegate, Send
     }
     
     func updateStuckSubscriberCount() {
-        YoutubeAPI.parseData(forID: publicId, parameters: [.StuckSubscriberCount], completionHandler: { result -> Void in
+        YoutubeAPI.parseData(forID: Public.id, parameters: [.StuckSubscriberCount], completionHandler: { result -> Void in
             switch result {
             case let .Success(result):
                 self.updateView(withValues: result as! [String: AnyObject])
@@ -253,7 +256,7 @@ class SubscriberCountViewController: UIViewController, UITextFieldDelegate, Send
         if let stuckSubCount = values["stuckSubscriberCount"] as? String { self.stuckSubscriberCountLabel.text = stuckSubCount }
         if let views = values["viewsCount"] as? String { self.viewsCountLabel.text = views }
         if let videos = values["videosCount"] as? String { self.videoCountLabel.text = videos }
-        if let id = values["id"] as? String { publicId = id }
+        if let id = values["id"] as? String { Public.id = id }
         if let image = values["image"] as? UIImage {
             self.imageView.image = image
             self.thumbnailImageView.image = image

@@ -159,10 +159,10 @@
 			isa = PBXGroup;
 			children = (
 				5488900C1D755EA300C69B72 /* AppDelegate.swift */,
-				54FA8D291D785F4000570D61 /* BookmarksTableViewController.swift */,
 				54FA8D2B1D785FCE00570D61 /* SubscriberCell.swift */,
-				548890441D75AED700C69B72 /* YoutubeAPI.swift */,
+				54FA8D291D785F4000570D61 /* BookmarksTableViewController.swift */,
 				548890201D7562CD00C69B72 /* SubscriberCountViewController.swift */,
+				548890441D75AED700C69B72 /* YoutubeAPI.swift */,
 				548890481D76DB5D00C69B72 /* SubscriberProfile.swift */,
 				54FA8D2D1D787C5900570D61 /* SubscriberProfileStore.swift */,
 				548890101D755EA300C69B72 /* Main.storyboard */,
