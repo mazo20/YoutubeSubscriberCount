@@ -12,18 +12,56 @@ import UIKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-    
+    var shortcutItem: UIApplicationShortcutItem?
     let store = SubscriberProfileStore()
 
-
+    func application(application: UIApplication, continueUserActivity userActivity: NSUserActivity, restorationHandler: ([AnyObject]?) -> Void) -> Bool {
+        let viewController = (window?.rootViewController as! UINavigationController).viewControllers[0] as! SubscriberCountViewController
+        if !viewController.isBeingPresented() {
+            viewController.dismissViewControllerAnimated(true, completion: nil)
+        }
+        viewController.restoreUserActivityState(userActivity)
+        
+        return true
+    }
+    
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         // Override point for customization after application launch.
+        
+        
+        
+        var performShortcutDelegate = true
+        if let shortcutItem = launchOptions?[UIApplicationLaunchOptionsShortcutItemKey] as? UIApplicationShortcutItem {
+            print("Application launched via shortcut")
+            self.shortcutItem = shortcutItem
+            performShortcutDelegate = false
+        }
         
         let navController = window?.rootViewController as! UINavigationController
         let subViewController = navController.topViewController as! SubscriberCountViewController
         subViewController.store = store
         
-        return true
+        return performShortcutDelegate
+    }
+    
+    func application(application: UIApplication, performActionForShortcutItem shortcutItem: UIApplicationShortcutItem, completionHandler: (Bool) -> Void) {
+        completionHandler(handleShortcut(shortcutItem))
+    }
+    
+    func handleShortcut(shortcutItem:UIApplicationShortcutItem) -> Bool {
+        var succeeded = false
+        let viewController = (window?.rootViewController as! UINavigationController).viewControllers[0] as! SubscriberCountViewController
+        if !viewController.isBeingPresented() {
+            viewController.dismissViewControllerAnimated(true, completion: nil)
+        }
+        if shortcutItem.type == "search" {
+            viewController.searchTextFieldBecomeFirstResponder()
+            succeeded = true
+        } else if shortcutItem.type == "bookmarks" {
+            viewController.performSegueWithIdentifier("Bookmarks", sender: self)
+            succeeded = true
+        }
+        return succeeded
     }
 
     func applicationWillResignActive(application: UIApplication) {
@@ -45,10 +83,24 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func applicationWillEnterForeground(application: UIApplication) {
         // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
+        
+        guard let shortcut = shortcutItem else { return }
+        handleShortcut(shortcut)
+        self.shortcutItem = nil
+        
     }
-
+    
     func applicationDidBecomeActive(application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+        print("Application did become active")
+        
+        guard let shortcut = shortcutItem else { return }
+        
+        print("- Shortcut property has been set")
+        
+        handleShortcut(shortcut)
+        
+        self.shortcutItem = nil
     }
 
     func applicationWillTerminate(application: UIApplication) {

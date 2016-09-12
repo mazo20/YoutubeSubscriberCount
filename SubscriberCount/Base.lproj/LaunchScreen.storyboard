@@ -16,7 +16,20 @@
                     <view key="view" contentMode="scaleToFill" id="Ze5-6b-2t3">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="YouTube-520.png" translatesAutoresizingMaskIntoConstraints="NO" id="KSe-wv-rGM">
+                                <rect key="frame" x="225" y="225" width="150" height="150"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="150" id="Fht-5w-FhH"/>
+                                    <constraint firstAttribute="height" constant="150" id="raL-qP-f2G"/>
+                                </constraints>
+                            </imageView>
+                        </subviews>
+                        <color key="backgroundColor" red="0.99990874529999996" green="1" blue="0.99987798930000005" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="KSe-wv-rGM" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="WWS-Gq-ze3"/>
+                            <constraint firstItem="KSe-wv-rGM" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="rJh-8x-Tul"/>
+                        </constraints>
                     </view>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="iYj-Kq-Ea1" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -24,4 +37,7 @@
             <point key="canvasLocation" x="53" y="375"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="YouTube-520.png" width="520" height="520"/>
+    </resources>
 </document>

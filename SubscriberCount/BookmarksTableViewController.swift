@@ -7,6 +7,8 @@
 //
 
 import UIKit
+import CoreSpotlight
+import MobileCoreServices
 
 protocol SendIdDelegate: class {
     func sendData(data: String)
@@ -28,7 +30,34 @@ class BookmarksTableViewController: UIViewController {
     @IBAction func cancelButton(sender: AnyObject) {
         self.dismissViewControllerAnimated(true, completion: nil)
     }
-    
+    override func viewDidLoad() {
+        var searchableItems = [CSSearchableItem]()
+        for profile in store.store {
+            let searchableItemAttributeSet = CSSearchableItemAttributeSet(itemContentType: kUTTypeText as String)
+            searchableItemAttributeSet.title = profile.channelName
+            searchableItemAttributeSet.containerTitle = "test"
+            let data = NSData(data: UIImagePNGRepresentation(profile.image)!)
+            searchableItemAttributeSet.thumbnailData = data
+            searchableItemAttributeSet.keywords = [profile.channelName]
+            
+            let searchableItem = CSSearchableItem(uniqueIdentifier: profile.id, domainIdentifier: "channels", attributeSet: searchableItemAttributeSet)
+            
+            searchableItems.append(searchableItem)
+        }
+        CSSearchableIndex.defaultSearchableIndex().indexSearchableItems(searchableItems, completionHandler: { (ErrorType) -> Void in
+            if (ErrorType != nil) {
+                print("indexing failed \(ErrorType)")
+            }
+        })
+    }
+}
+extension SubscriberProfileStore {
+    func moveProfile(fromIndex: Int, toIndex: Int) {
+        guard fromIndex != toIndex else { return }
+        let profile = store[fromIndex]
+        store.removeAtIndex(fromIndex)
+        store.insert(profile, atIndex: toIndex)
+    }
 }
 
 extension BookmarksTableViewController: UITableViewDelegate, UITableViewDataSource {
@@ -38,6 +67,9 @@ extension BookmarksTableViewController: UITableViewDelegate, UITableViewDataSour
             store.store.removeAtIndex(indexPath.row)
             self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
         }
+    }
+    func tableView(tableView: UITableView, moveRowAtIndexPath sourceIndexPath: NSIndexPath, toIndexPath destinationIndexPath: NSIndexPath) {
+        store.moveProfile(sourceIndexPath.row, toIndex: destinationIndexPath.row)
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -62,5 +94,8 @@ extension BookmarksTableViewController: UITableViewDelegate, UITableViewDataSour
         dispatch_async(dispatch_get_main_queue(),{
             self.dismissViewControllerAnimated(true, completion: nil)
         })
+    }
+    func tableView(tableView: UITableView, titleForFooterInSection section: Int) -> String? {
+        return "First three channels will be shown in a widget"
     }
 }

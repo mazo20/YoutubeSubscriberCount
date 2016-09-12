@@ -6,6 +6,7 @@
 //  Copyright © 2016 Maciej Kowalski. All rights reserved.
 //
 
+import SubscriberCountKit
 import UIKit
 
 class SubscriberProfile: NSObject, NSCoding {

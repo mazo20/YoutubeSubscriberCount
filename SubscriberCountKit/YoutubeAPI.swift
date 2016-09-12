@@ -12,11 +12,11 @@ enum Method: String {
     case Search = "search?"
     case Channels = "channels?"
 }
-enum Result {
+public enum Result {
     case Success(AnyObject)
     case Failure(ErrorType)
 }
-enum Error: ErrorType {
+public enum Error: ErrorType {
     case PhotoError
     case StuckSubError
     case DataError
@@ -24,15 +24,15 @@ enum Error: ErrorType {
     case ConstructingError
     case JSONError
 }
-enum DataParameters {
+public enum DataParameters {
     case Photo
     case Data
     case StuckSubscriberCount
 }
 
-struct YoutubeAPI {
+public struct YoutubeAPI {
     private static let baseURLString = "https://www.googleapis.com/youtube/v3/"
-    private static let APIKey = "AIzaSyCLuq2COJS2ZOybx8RTlIZ5_ho3w8wdIWI"
+    private static let APIKey = ["AIzaSyBKoz_46nVMrkdZqYmgs-q2uhu81AEKEoc", "AIzaSyAaRTD6E--TcqXQ6u0vz3tbds8JmT4obnM", "AIzaSyAgG6SUKqjUj5NJejwXrUIphrePzjCVZdc", "AIzaSyCLuq2COJS2ZOybx8RTlIZ5_ho3w8wdIWI"]
     
     static func youtubeURL(method method: Method, part: [String], parameters:[String: String]) -> NSURL {
         let components = NSURLComponents(string: baseURLString + method.rawValue)!
@@ -44,7 +44,8 @@ struct YoutubeAPI {
             let item = NSURLQueryItem(name: key, value: value)
             queryItems.append(item)
         }
-        item = NSURLQueryItem(name: "key", value: APIKey)
+        let random = Int(arc4random_uniform(4))
+        item = NSURLQueryItem(name: "key", value: APIKey[random])
         queryItems.append(item)
         components.queryItems = queryItems
         
@@ -52,6 +53,7 @@ struct YoutubeAPI {
     }
     
     static func photoForId(id: String, completionHandler: (Result) -> Void ) {
+        var returnData = [String]()
         let url = youtubeURL(method: .Channels, part: ["snippet"], parameters: ["id": id])
         jsonSerialization(url, completionHandler:  { dataResult -> Void in
             switch dataResult {
@@ -60,8 +62,11 @@ struct YoutubeAPI {
                     let snippet = items[0]["snippet"] as? NSDictionary,
                     thumbnails = snippet["thumbnails"] as? NSDictionary,
                     image = thumbnails["medium"] as? NSDictionary,
-                    urlString = image["url"] as? String {
-                        completionHandler(.Success(urlString))
+                    urlString = image["url"] as? String,
+                    title = snippet["title"] as? String {
+                        returnData.append(urlString)
+                        returnData.append(title)
+                        completionHandler(.Success(returnData))
                 } else {
                     completionHandler(.Failure(Error.PhotoError))
                 }
@@ -101,31 +106,27 @@ struct YoutubeAPI {
     
     static func dataForId(id: String, completionHandler: (Result) -> Void ){
         var returnData = [String]()
-        let url = youtubeURL(method: .Channels, part: ["statistics", "snippet"], parameters: ["id": id])
+        let url = youtubeURL(method: .Channels, part: ["statistics"], parameters: ["id": id])
         jsonSerialization(url, completionHandler: { dataResult -> Void in
             switch dataResult {
             case let .Success(result):
-                if let items = result["items"] as? [[String: AnyObject]] where items.count > 0, let snippet = items[0]["snippet"] as? NSDictionary, title = snippet["title"] as? String{
-                    returnData.append(title)
-                    let numberFormatter = NSNumberFormatter()
-                    numberFormatter.numberStyle = NSNumberFormatterStyle.DecimalStyle
-                    if let statistics = items[0]["statistics"] as? [String: AnyObject],
-                        subscriberCount = statistics["subscriberCount"] as? String,
-                        subscriberNumber = Int(subscriberCount),
-                        finalSubscriber = numberFormatter.stringFromNumber(subscriberNumber),
-                        viewCount = statistics["viewCount"] as? String,
-                        viewNumber = Int(viewCount),
-                        finalView = numberFormatter.stringFromNumber(viewNumber),
-                        videoCount = statistics["videoCount"] as? String,
-                        videoNumber = Int(videoCount),
-                        finalVideo = numberFormatter.stringFromNumber(videoNumber) {
-                            returnData.append(finalSubscriber)
-                            returnData.append(finalView)
-                            returnData.append(finalVideo)
-                            completionHandler(.Success(returnData))
-                    } else {
-                        completionHandler(.Failure(Error.DataError))
-                    }
+                let numberFormatter = NSNumberFormatter()
+                numberFormatter.numberStyle = NSNumberFormatterStyle.DecimalStyle
+                if let items = result["items"] as? [[String: AnyObject]] where items.count > 0,
+                    let statistics = items[0]["statistics"] as? [String: AnyObject],
+                    subscriberCount = statistics["subscriberCount"] as? String,
+                    subscriberNumber = Int(subscriberCount),
+                    finalSubscriber = numberFormatter.stringFromNumber(subscriberNumber),
+                    viewCount = statistics["viewCount"] as? String,
+                    viewNumber = Int(viewCount),
+                    finalView = numberFormatter.stringFromNumber(viewNumber),
+                    videoCount = statistics["videoCount"] as? String,
+                    videoNumber = Int(videoCount),
+                    finalVideo = numberFormatter.stringFromNumber(videoNumber) {
+                        returnData.append(finalSubscriber)
+                        returnData.append(finalView)
+                        returnData.append(finalVideo)
+                        completionHandler(.Success(returnData))
                 } else {
                     completionHandler(.Failure(Error.DataError))
                 }
@@ -177,7 +178,7 @@ struct YoutubeAPI {
         task.resume()
     }
     
-    static func parseAllData(forName: String, completionHandler: (Result) -> Void) {
+    public static func parseAllData(forName: String, completionHandler: (Result) -> Void) {
         idForName(forName, completionHandler: { idResult -> Void in
             switch idResult {
             case let .Success(result):
@@ -207,18 +208,19 @@ struct YoutubeAPI {
             }
         })
     }
-    static func parseData(forID id: String, parameters: [DataParameters], completionHandler: (Result) -> Void) {
+    public static func parseData(forID id: String, parameters: [DataParameters], completionHandler: (Result) -> Void) {
         var subscriberDictionary = [String: AnyObject]()
-        subscriberDictionary["id"] = id
         let group = dispatch_group_create()
         if parameters.contains(.Photo) {
             dispatch_group_enter(group)
             photoForId(id, completionHandler: { photoResult -> Void in
                 switch photoResult {
                 case let .Success(result):
-                    let url = NSURL(string: result as! String)
+                    let array = result as! [String]
+                    let url = NSURL(string: array[0])
                     let imageData = NSData(contentsOfURL: url!)
                     subscriberDictionary["image"] = UIImage(data: imageData!)
+                    subscriberDictionary["channelName"] = array[1]
                     dispatch_group_leave(group)
                 case let .Failure(error):
                     print(error)
@@ -232,10 +234,9 @@ struct YoutubeAPI {
                 switch dataResult {
                 case let .Success(result):
                     if let array = result as? [String] {
-                        subscriberDictionary["channelName"] = array[0]
-                        subscriberDictionary["liveSubscriberCount"] = array[1]
-                        subscriberDictionary["viewsCount"] = array[2]
-                        subscriberDictionary["videosCount"] = array[3]
+                        subscriberDictionary["liveSubscriberCount"] = array[0]
+                        subscriberDictionary["viewsCount"] = array[1]
+                        subscriberDictionary["videosCount"] = array[2]
                         dispatch_group_leave(group)
                     }
                 case let .Failure(error):
@@ -258,6 +259,7 @@ struct YoutubeAPI {
             })
         }
         dispatch_group_notify(group, dispatch_get_main_queue()) {
+            subscriberDictionary["id"] = id
             if subscriberDictionary["stuckSubscriberCount"] == nil && parameters.count == 3{
                 if let live = subscriberDictionary["liveSubscriberCount"] as? String {
                     subscriberDictionary["stuckSubscriberCount"] = live

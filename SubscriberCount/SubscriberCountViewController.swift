@@ -7,6 +7,9 @@
 //
 
 import UIKit
+import SubscriberCountKit
+import CoreSpotlight
+import MobileCoreServices
 
 //public var publicId = "UCtinbF-Q-fVthA0qrFQTgXQ"
 public struct Public {
@@ -35,8 +38,31 @@ class SubscriberCountViewController: UIViewController, UITextFieldDelegate, Send
     var timer: NSTimer!
     var repeatButton: UIButton!
     var name = ""
+    var textFieldShouldBecomeFirstResponder = false
+    
+    override func restoreUserActivityState(activity: NSUserActivity) {
+        if activity.activityType == CSSearchableItemActionType {
+            if let userInfo = activity.userInfo {
+                let selectedProfile = userInfo[CSSearchableItemActivityIdentifier] as! String
+                name = selectedProfile
+                newProfile(withName: name)
+                print(selectedProfile)
+            }
+        }
+    }
+    
+    func searchTextFieldBecomeFirstResponder() {
+        if let textField = searchTextField {
+            textField.becomeFirstResponder()
+        }
+        textFieldShouldBecomeFirstResponder = true
+    }
     
     override func viewDidLoad() {
+        if textFieldShouldBecomeFirstResponder {
+            searchTextField.becomeFirstResponder()
+        }
+        
         stackView.hidden = true
         
         self.navigationController?.navigationBar.backgroundColor = UIColor.clearColor()
@@ -57,7 +83,6 @@ class SubscriberCountViewController: UIViewController, UITextFieldDelegate, Send
         self.view.addSubview(loadingAnimation)
         loadingAnimation.hidesWhenStopped = true
         loadingAnimation.startAnimation()
-        
         
         repeatButton = UIButton(frame: frame)
         repeatButton.addTarget(self, action: #selector(self.update), forControlEvents: .TouchUpInside)
@@ -105,16 +130,18 @@ class SubscriberCountViewController: UIViewController, UITextFieldDelegate, Send
         thumbnailImageView.layer.borderColor = UIColor.blackColor().CGColor
         thumbnailImageView.clipsToBounds = true
         
-        timer = NSTimer.scheduledTimerWithTimeInterval(1, target: self, selector: #selector(self.updateLiveSubscriberCount), userInfo: nil, repeats: true)
         _ = NSTimer.scheduledTimerWithTimeInterval(30, target: self, selector: #selector(self.updateStuckSubscriberCount), userInfo: nil, repeats: true)
         
         if store.store.count > 0 {
-            let index = Int(arc4random_uniform(UInt32(store.store.count)))
-            newProfile(withName: store.store[index].id)
+            newProfile(withName: store.store[0].id)
         } else {
             newProfile(withName: Public.id)
         }
         
+    }
+    
+    @IBAction func tapGestureRecognizer(sender: AnyObject) {
+        self.view.endEditing(true)
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -122,9 +149,26 @@ class SubscriberCountViewController: UIViewController, UITextFieldDelegate, Send
     }
     
     @IBAction func shareButton(sender: AnyObject) {
-        let firstActivityItem = "To be added"
+        guard !self.stackView.hidden else { return }
+        let firstActivityItem = "\(self.channelNameLabel.text!) subscriber count is \(self.liveSubscriberCountLabel.text!) - via SubTrack. Download at www.appstore.com"
         
-        let activityViewController = UIActivityViewController(activityItems: [firstActivityItem], applicationActivities: nil)
+        
+        let window = UIApplication.sharedApplication().delegate!.window!!
+        UIGraphicsBeginImageContextWithOptions(window.bounds.size, false, 0)
+        window.drawViewHierarchyInRect(window.bounds, afterScreenUpdates: true)
+        let windowImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        //now position the image x/y away from the top-left corner to get the portion we want
+        var size = self.stackView.frame.size
+        size.height+=40
+        size.width+=20
+        UIGraphicsBeginImageContextWithOptions(size, false, 0)
+        windowImage.drawAtPoint(CGPoint(x: -self.stackView.frame.origin.x+10, y: -self.stackView.frame.origin.y+20))
+        let image: UIImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        let secondActivityItem = image
+        
+        let activityViewController = UIActivityViewController(activityItems: [firstActivityItem, secondActivityItem], applicationActivities: nil)
         activityViewController.popoverPresentationController?.sourceView = (sender as! UIButton)
         activityViewController.popoverPresentationController?.permittedArrowDirections = UIPopoverArrowDirection()
         activityViewController.popoverPresentationController?.sourceRect = CGRect(x: 150, y: 150, width: 0, height: 0)
@@ -188,6 +232,7 @@ class SubscriberCountViewController: UIViewController, UITextFieldDelegate, Send
                 default:
                     self.repeatLabel.hidden = false
                     self.repeatButton.hidden = false
+
                 }
             }
         } else {
@@ -206,15 +251,33 @@ class SubscriberCountViewController: UIViewController, UITextFieldDelegate, Send
         shouldShowError(false)
         self.stackView.hidden = true
         loadingAnimation.startAnimation()
-        timer.invalidate()
+        if let timer = timer {
+            timer.invalidate()
+        }
         YoutubeAPI.parseAllData(name, completionHandler: { result -> Void in
             switch result {
             case let .Success(result):
                 dispatch_async(dispatch_get_main_queue()) {
+                    let k = result as! [String: AnyObject]
                     self.updateView(withValues: result as! [String: AnyObject])
+                    let searchableItemAttributeSet = CSSearchableItemAttributeSet(itemContentType: kUTTypeText as String)
+                    searchableItemAttributeSet.title = (k["channelName"] as! String)
+                    let data = NSData(data: UIImagePNGRepresentation(k["image"] as! UIImage)!)
+                    searchableItemAttributeSet.thumbnailData = data
+                    let keywords = k["channelName"] as! String
+                    searchableItemAttributeSet.keywords =
+                        keywords.componentsSeparatedByString(" ")
+                    
+                    let searchableItem = CSSearchableItem(uniqueIdentifier: (k["id"] as! String), domainIdentifier: "channels", attributeSet: searchableItemAttributeSet)
+                    
+                    CSSearchableIndex.defaultSearchableIndex().indexSearchableItems([searchableItem], completionHandler: { (ErrorType) -> Void in
+                        if (ErrorType != nil) {
+                            print("indexing failed \(ErrorType)")
+                        }
+                    })
                     self.updateBookmark()
                     self.stackView.hidden = false
-                    self.timer = NSTimer.scheduledTimerWithTimeInterval(1, target: self, selector: #selector(self.updateLiveSubscriberCount), userInfo: nil, repeats: true)
+                    self.timer = NSTimer.scheduledTimerWithTimeInterval(2, target: self, selector: #selector(self.updateLiveSubscriberCount), userInfo: nil, repeats: true)
                     self.loadingAnimation.stopAnimation()
                 }
             case let .Failure(error):
@@ -273,6 +336,8 @@ class SubscriberCountViewController: UIViewController, UITextFieldDelegate, Send
     }
     
     func sendData(data: String) {
-        newProfile(withName: data)
+        name = data
+        newProfile(withName: name)
+        searchTextField.text = ""
     }
 }
