@@ -2,11 +2,12 @@
 //  SubscriberCountKit.h
 //  SubscriberCountKit
 //
-//  Created by Maciej Kowalski on 10.09.2016.
+//  Created by Maciej Kowalski on 14.09.2016.
 //  Copyright © 2016 Maciej Kowalski. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
+#import <SubscriberCountKit/SubscriberCountKit.h>
 
 //! Project version number for SubscriberCountKit.
 FOUNDATION_EXPORT double SubscriberCountKitVersionNumber;

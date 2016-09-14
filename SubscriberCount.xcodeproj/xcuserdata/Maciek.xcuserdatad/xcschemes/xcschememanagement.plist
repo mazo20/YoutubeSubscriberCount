@@ -7,7 +7,7 @@
 		<key>SubTracker.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>2</integer>
+			<integer>1</integer>
 		</dict>
 		<key>SubscriberCount.xcscheme</key>
 		<dict>
@@ -19,7 +19,7 @@
 		<key>SubscriberCountKit.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>1</integer>
+			<integer>2</integer>
 		</dict>
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
@@ -50,6 +50,31 @@
 			<true/>
 		</dict>
 		<key>54427DF51D8491A2002B5EBC</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>5449305D1D893472007AECF3</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>544930721D8936D0007AECF3</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>54496B0B1D893B9C00752F5E</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>54496B201D893C1F00752F5E</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>54496C111D89E22900752F5E</key>
 		<dict>
 			<key>primary</key>
 			<true/>

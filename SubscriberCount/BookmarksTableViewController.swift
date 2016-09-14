@@ -11,7 +11,7 @@ import CoreSpotlight
 import MobileCoreServices
 
 protocol SendIdDelegate: class {
-    func sendData(data: String)
+    func sendData(_ data: String)
 }
 
 class BookmarksTableViewController: UIViewController {
@@ -22,13 +22,13 @@ class BookmarksTableViewController: UIViewController {
     @IBOutlet var editButton: UIBarButtonItem!
     @IBOutlet var tableView: UITableView!
     
-    @IBAction func editButton(sender: AnyObject) {
-        editButton.title = tableView.editing == true ? "Edit" : "Done"
-        tableView.setEditing(!tableView.editing, animated: true)
+    @IBAction func editButton(_ sender: AnyObject) {
+        editButton.title = tableView.isEditing == true ? "Edit" : "Done"
+        tableView.setEditing(!tableView.isEditing, animated: true)
     }
     
-    @IBAction func cancelButton(sender: AnyObject) {
-        self.dismissViewControllerAnimated(true, completion: nil)
+    @IBAction func cancelButton(_ sender: AnyObject) {
+        self.dismiss(animated: true, completion: nil)
     }
     override func viewDidLoad() {
         var searchableItems = [CSSearchableItem]()
@@ -36,7 +36,7 @@ class BookmarksTableViewController: UIViewController {
             let searchableItemAttributeSet = CSSearchableItemAttributeSet(itemContentType: kUTTypeText as String)
             searchableItemAttributeSet.title = profile.channelName
             searchableItemAttributeSet.containerTitle = "test"
-            let data = NSData(data: UIImagePNGRepresentation(profile.image)!)
+            let data = NSData(data: UIImagePNGRepresentation(profile.image)!) as Data
             searchableItemAttributeSet.thumbnailData = data
             searchableItemAttributeSet.keywords = [profile.channelName]
             
@@ -44,7 +44,7 @@ class BookmarksTableViewController: UIViewController {
             
             searchableItems.append(searchableItem)
         }
-        CSSearchableIndex.defaultSearchableIndex().indexSearchableItems(searchableItems, completionHandler: { (ErrorType) -> Void in
+        CSSearchableIndex.default().indexSearchableItems(searchableItems, completionHandler: { (ErrorType) -> Void in
             if (ErrorType != nil) {
                 print("indexing failed \(ErrorType)")
             }
@@ -52,50 +52,50 @@ class BookmarksTableViewController: UIViewController {
     }
 }
 extension SubscriberProfileStore {
-    func moveProfile(fromIndex: Int, toIndex: Int) {
+    func moveProfile(_ fromIndex: Int, toIndex: Int) {
         guard fromIndex != toIndex else { return }
         let profile = store[fromIndex]
-        store.removeAtIndex(fromIndex)
-        store.insert(profile, atIndex: toIndex)
+        store.remove(at: fromIndex)
+        store.insert(profile, at: toIndex)
     }
 }
 
 extension BookmarksTableViewController: UITableViewDelegate, UITableViewDataSource {
     
-    func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
-        if editingStyle == .Delete {
-            store.store.removeAtIndex(indexPath.row)
-            self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
+            store.store.remove(at: (indexPath as NSIndexPath).row)
+            self.tableView.deleteRows(at: [indexPath], with: .automatic)
         }
     }
-    func tableView(tableView: UITableView, moveRowAtIndexPath sourceIndexPath: NSIndexPath, toIndexPath destinationIndexPath: NSIndexPath) {
-        store.moveProfile(sourceIndexPath.row, toIndex: destinationIndexPath.row)
+    func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+        store.moveProfile((sourceIndexPath as NSIndexPath).row, toIndex: (destinationIndexPath as NSIndexPath).row)
     }
     
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return store.store.count
     }
     
-    func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return 0.00001
     }
     
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("SubscriberCell", forIndexPath: indexPath) as! SubscriberCell
-        cell.channelName.text = store.store[indexPath.row].channelName
-        cell.thumbnailImageView.image = store.store[indexPath.row].image
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "SubscriberCell", for: indexPath) as! SubscriberCell
+        cell.channelName.text = store.store[(indexPath as NSIndexPath).row].channelName
+        cell.thumbnailImageView.image = store.store[(indexPath as NSIndexPath).row].image
         cell.thumbnailImageView.layer.cornerRadius = 5
         cell.thumbnailImageView.layer.masksToBounds = true
         return cell
     }
     
-    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        self.delegate?.sendData(store.store[indexPath.row].id)
-        dispatch_async(dispatch_get_main_queue(),{
-            self.dismissViewControllerAnimated(true, completion: nil)
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        self.delegate?.sendData(store.store[(indexPath as NSIndexPath).row].id)
+        DispatchQueue.main.async(execute: {
+            self.dismiss(animated: true, completion: nil)
         })
     }
-    func tableView(tableView: UITableView, titleForFooterInSection section: Int) -> String? {
+    func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
         return "First three channels will be shown in a widget"
     }
 }

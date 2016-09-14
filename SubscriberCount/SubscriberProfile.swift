@@ -6,7 +6,7 @@
 //  Copyright © 2016 Maciej Kowalski. All rights reserved.
 //
 
-import SubscriberCountKit
+
 import UIKit
 
 class SubscriberProfile: NSObject, NSCoding {
@@ -21,16 +21,16 @@ class SubscriberProfile: NSObject, NSCoding {
         self.id = id
     }
     
-    func encodeWithCoder(aCoder: NSCoder) {
-        aCoder.encodeObject(channelName, forKey: "channelName")
-        aCoder.encodeObject(image, forKey: "image")
-        aCoder.encodeObject(id, forKey: "id")
+    func encode(with aCoder: NSCoder) {
+        aCoder.encode(channelName, forKey: "channelName")
+        aCoder.encode(image, forKey: "image")
+        aCoder.encode(id, forKey: "id")
     }
     
     required init?(coder aDecoder: NSCoder) {
-        image = aDecoder.decodeObjectForKey("image") as! UIImage
-        channelName = aDecoder.decodeObjectForKey("channelName") as! String
-        id = aDecoder.decodeObjectForKey("id") as! String
+        image = aDecoder.decodeObject(forKey: "image") as! UIImage
+        channelName = aDecoder.decodeObject(forKey: "channelName") as! String
+        id = aDecoder.decodeObject(forKey: "id") as! String
     }
     
 }
