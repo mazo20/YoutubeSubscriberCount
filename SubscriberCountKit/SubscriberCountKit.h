@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <SubscriberCountKit/SubscriberCountKit.h>
 
 //! Project version number for SubscriberCountKit.
 FOUNDATION_EXPORT double SubscriberCountKitVersionNumber;

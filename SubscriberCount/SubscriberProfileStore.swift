@@ -12,20 +12,20 @@ class SubscriberProfileStore: NSObject {
     
     var store = [SubscriberProfile]()
     
-    let profilesArchiveURL: NSURL = {
-        let documentsDirectories = NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask)
+    let profilesArchiveURL: URL = {
+        let documentsDirectories = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
         let documentDirectory = documentsDirectories.first!
-        return documentDirectory.URLByAppendingPathComponent("decks.archive")
+        return documentDirectory.appendingPathComponent("decks.archive")
     }()
     
     override init() {
-        if let archivedDecks = NSKeyedUnarchiver.unarchiveObjectWithFile(profilesArchiveURL.path!) as? [SubscriberProfile] {
+        if let archivedDecks = NSKeyedUnarchiver.unarchiveObject(withFile: profilesArchiveURL.path) as? [SubscriberProfile] {
             store += archivedDecks
         }
     }
     
     func saveChanges() -> Bool {
-        print("Saving profiles to \(profilesArchiveURL.path!)")
-        return NSKeyedArchiver.archiveRootObject(store, toFile: profilesArchiveURL.path!)
+        print("Saving profiles to \(profilesArchiveURL.path)")
+        return NSKeyedArchiver.archiveRootObject(store, toFile: profilesArchiveURL.path)
     }
 }
