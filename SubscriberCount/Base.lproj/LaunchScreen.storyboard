@@ -18,14 +18,14 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="8.png" translatesAutoresizingMaskIntoConstraints="NO" id="KSe-wv-rGM">
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="icon_b&amp;w_launch.png" translatesAutoresizingMaskIntoConstraints="NO" id="KSe-wv-rGM">
                                 <constraints>
                                     <constraint firstAttribute="width" constant="150" id="Fht-5w-FhH"/>
                                     <constraint firstAttribute="height" constant="150" id="raL-qP-f2G"/>
                                 </constraints>
                             </imageView>
                         </subviews>
-                        <color key="backgroundColor" red="0.99989223480224609" green="0.99998199939727783" blue="0.99983739852905273" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <color key="backgroundColor" red="0.99990874529999996" green="1" blue="0.99987798930000005" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="KSe-wv-rGM" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="WWS-Gq-ze3"/>
                             <constraint firstItem="KSe-wv-rGM" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="rJh-8x-Tul"/>
@@ -38,6 +38,6 @@
         </scene>
     </scenes>
     <resources>
-        <image name="8.png" width="1024" height="1024"/>
+        <image name="icon_b&amp;w_launch.png" width="500" height="500"/>
     </resources>
 </document>

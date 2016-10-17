@@ -9,7 +9,6 @@
 import UIKit
 import CoreSpotlight
 import MobileCoreServices
-import SubscriberCountKit
 
 public struct Public {
     static var id = "UC-lHJZR3Gqxm24_Vd_AJ5Yw"
@@ -18,7 +17,14 @@ public struct Public {
 class SubscriberCountViewController: UIViewController{
     
     var store: SubscriberProfileStore!
-    var idStore = UserDefaults.standard.object(forKey: "idStore") as! [String: String]
+    var showNewProfile = true
+    var idStore: [String: String] {
+        if let store = UserDefaults.standard.object(forKey: "idStore") as? [String: String] {
+            return store
+        } else {
+            return [String: String]()
+        }
+    }
     //var idStore = [String: String]()
     
     @IBOutlet var thumbnailImageView: UIImageView!
@@ -33,10 +39,10 @@ class SubscriberCountViewController: UIViewController{
     
     let imageView = UIImageView()
     let visualEffect = UIVisualEffectView()
-    //var loadingAnimation: NVActivityIndicatorView!
+    var loadingAnimation: NVActivityIndicatorView!
     var repeatLabel: UILabel!
     var noIDLabel: UILabel!
-    var timer: Timer!
+    var timer: Timer?
     var repeatButton: UIButton!
     var name = ""
     var textFieldShouldBecomeFirstResponder = false
@@ -56,7 +62,6 @@ class SubscriberCountViewController: UIViewController{
         if textFieldShouldBecomeFirstResponder {
             searchTextField.becomeFirstResponder()
         }
-        
         stackView.isHidden = true
         
         self.navigationController?.navigationBar.backgroundColor = UIColor.clear
@@ -71,36 +76,36 @@ class SubscriberCountViewController: UIViewController{
         searchTextField.clearButtonMode = .whileEditing
         searchTextField.clearsOnBeginEditing = true
         
+        let width = sqrt(self.view.bounds.size.width)*3.05
+        var frame = CGRect(origin: CGPoint.zero, size: CGSize(width: width, height: width))
         
-        var frame = CGRect(origin: CGPoint.zero, size: CGSize(width: 70, height: 70))
         
-        /*
-         loadingAnimation = NVActivityIndicatorView(frame: frame, type: .BallPulse, color: UIColor.black, padding: nil)
-         loadingAnimation.center = self.view.center
-         self.view.addSubview(loadingAnimation)
-         loadingAnimation.hidesWhenStopped = true
-         loadingAnimation.startAnimation()
-         */
+        loadingAnimation = NVActivityIndicatorView(frame: frame, type: .ballPulse, color: UIColor.black, padding: nil)
+        loadingAnimation.center = self.view.center
+        self.view.addSubview(loadingAnimation)
+        loadingAnimation.hidesWhenStopped = true
+        loadingAnimation.startAnimation()
         
         repeatButton = UIButton(frame: frame)
         repeatButton.addTarget(self, action: #selector(self.update), for: .touchUpInside)
         repeatButton.center = self.view.center
-        repeatButton.center.y+=150
-        repeatButton.setImage(UIImage(contentsOfFile: "Synchronize.png"), for: UIControlState())
+        repeatButton.center.y+=self.view.bounds.size.width/3
+        repeatButton.setImage(UIImage(imageLiteralResourceName: "Synchronize.png"), for: UIControlState())
         self.view.addSubview(repeatButton)
         
-        frame = CGRect(origin: CGPoint.zero, size: CGSize(width: 320, height: 100))
+        frame = CGRect(origin: CGPoint.zero, size: CGSize(width: self.view.bounds.size.width, height: 100))
         repeatLabel = UILabel(frame: frame)
         repeatLabel.text = "Oops!\nSomething went wrong"
-        repeatLabel.font = repeatLabel.font.withSize(20)
+        let fontSize = self.view.bounds.size.width/15
+        repeatLabel.font = repeatLabel.font.withSize(fontSize)
         repeatLabel.numberOfLines = 3
         repeatLabel.center = self.view.center
-        repeatLabel.center.y-=50
+        repeatLabel.center.y-=self.view.bounds.size.width/6
         repeatLabel.textAlignment = .center
         self.view.addSubview(repeatLabel)
         noIDLabel = UILabel(frame: frame)
         noIDLabel.text = "No channel found!\nSearch for something else"
-        noIDLabel.font = noIDLabel.font.withSize(20)
+        noIDLabel.font = noIDLabel.font.withSize(fontSize)
         noIDLabel.numberOfLines = 3
         noIDLabel.center = self.view.center
         noIDLabel.textAlignment = .center
@@ -123,19 +128,23 @@ class SubscriberCountViewController: UIViewController{
         self.view.sendSubview(toBack: imageView)
         visualEffect.effect = UIBlurEffect(style: UIBlurEffectStyle.light)
         
+        thumbnailImageView.bounds.size = CGSize(width: self.view.bounds.size.width/3, height: self.view.bounds.size.width/3)
         thumbnailImageView.layer.cornerRadius = 10
         thumbnailImageView.layer.borderWidth = 1
         thumbnailImageView.layer.borderColor = UIColor.black.cgColor
         thumbnailImageView.clipsToBounds = true
         
         _ = Timer.scheduledTimer(timeInterval: 30, target: self, selector: #selector(self.updateStuckSubscriberCount), userInfo: nil, repeats: true)
-        
-        if store.store.count > 0 {
-            newProfile(withName: store.store[0].id)
-        } else {
-            newProfile(withName: Public.id)
+        if showNewProfile {
+            if store.store.count > 0 {
+                newProfile(withName: store.store[0].id)
+            } else {
+                newProfile(withName: Public.id)
+            }
         }
+        
     }
+    
     
     override func viewWillAppear(_ animated: Bool) {
         updateBookmark()
@@ -147,7 +156,7 @@ class SubscriberCountViewController: UIViewController{
     
     @IBAction func shareButton(_ sender: AnyObject) {
         guard !self.stackView.isHidden else { return }
-        let firstActivityItem = "\(self.channelNameLabel.text!) subscriber count is \(self.liveSubscriberCountLabel.text!) - via SubTrack. Download at www.appstore.com"
+        let firstActivityItem = "\(self.channelNameLabel.text!) subscriber count is \(self.liveSubscriberCountLabel.text!) - via SubTracker. Download at http://tinyurl.com/hljn24l"
         
         
         let window = UIApplication.shared.delegate!.window!!
@@ -156,9 +165,11 @@ class SubscriberCountViewController: UIViewController{
         let windowImage = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         //now position the image x/y away from the top-left corner to get the portion we want
+        
         var size = self.stackView.frame.size
         size.height+=40
         size.width+=20
+        
         UIGraphicsBeginImageContextWithOptions(size, false, 0)
         windowImage?.draw(at: CGPoint(x: -self.stackView.frame.origin.x+10, y: -self.stackView.frame.origin.y+20))
         let image: UIImage = UIGraphicsGetImageFromCurrentImageContext()!
@@ -195,25 +206,25 @@ class SubscriberCountViewController: UIViewController{
         let profileInStore = self.store.store.filter{$0.id == Public.id}.first
         if let profileInStore = profileInStore {
             if changeState == nil {
-                self.bookmarkButton.image = UIImage(imageLiteralResourceName: "Bookmark_Filled.png")
+                self.bookmarkButton.image = UIImage(imageLiteralResourceName: "BookmarkFilled.png")
             } else {
                 let index = self.store.store.index(of: profileInStore)
                 self.store.store.remove(at: index!)
-                self.bookmarkButton.image = #imageLiteral(resourceName: "Bookmark_Empty.png")
+                self.bookmarkButton.image = UIImage(imageLiteralResourceName: "Bookmark.png")
             }
             
         } else {
             if changeState == nil {
-                self.bookmarkButton.image = UIImage(imageLiteralResourceName: "Bookmark_Empty.png")
+                self.bookmarkButton.image = UIImage(imageLiteralResourceName: "Bookmark.png")
             } else {
-                let subscriberProfile = SubscriberProfile(image: self.thumbnailImageView.image!, channelName: self.channelNameLabel.text!, id: Public.id)
+                let subscriberProfile = SubscriberProfile(image: self.thumbnailImageView.image!, channelName: self.channelNameLabel.text!, id: Public.id, subscriberCount: self.liveSubscriberCountLabel.text!)
                 self.store.store.append(subscriberProfile)
-                self.bookmarkButton.image = UIImage(imageLiteralResourceName: "Bookmark_Filled.png")
+                self.bookmarkButton.image = UIImage(imageLiteralResourceName: "BookmarkFilled.png")
             }
         }
     }
     
-    func shouldShowError(_ isTrue: Bool, error: SubscriberCountKit.Error? = nil) {
+    func shouldShowError(_ isTrue: Bool, error: Error? = nil) {
         if isTrue {
             if let errorType = error {
                 switch errorType {
@@ -237,12 +248,11 @@ class SubscriberCountViewController: UIViewController{
     }
     
     func newProfile(withName name: String) {
-        if let timer = timer {
-            timer.invalidate()
-        }
+        timer?.invalidate()
+        timer = nil
         shouldShowError(false)
         self.stackView.isHidden = true
-        //loadingAnimation.startAnimation()
+        loadingAnimation.startAnimation()
         var newName = name
         if let id = idStore[name] {
             newName = id
@@ -255,8 +265,15 @@ class SubscriberCountViewController: UIViewController{
                     self.updateView(withValues: subscriberDictionary)
                     
                     if newName != subscriberDictionary["id"] as! String {
-                        self.idStore[name] = (subscriberDictionary["id"] as! String)
-                        UserDefaults.standard.set(self.idStore, forKey: "idStore")
+                        var store = self.idStore
+                        store[name] = (subscriberDictionary["id"] as! String)
+                        UserDefaults.standard.set(store, forKey: "idStore")
+                    }
+                    if let profile = self.store.store.filter({ $0.id == subscriberDictionary["id"] as! String }).first {
+                        print(profile)
+                        profile.image = subscriberDictionary["image"] as! UIImage
+                        profile.channelName = subscriberDictionary["channelName"] as! String
+                        profile.subscriberCount = subscriberDictionary["liveSubscriberCount"] as! String
                     }
                     
                     let searchableItemAttributeSet = CSSearchableItemAttributeSet(itemContentType: kUTTypeText as String)
@@ -290,14 +307,14 @@ class SubscriberCountViewController: UIViewController{
                     Public.id = subscriberDictionary["id"] as! String
                     self.updateBookmark()
                     self.timer = Timer.scheduledTimer(timeInterval: timer, target: self, selector: #selector(self.updateLiveSubscriberCount), userInfo: nil, repeats: true)
-                    //self.loadingAnimation.stopAnimation()
+                    self.loadingAnimation.stopAnimation()
                 }
             case let .failure(error):
                 print(error)
                 let errorType = error
                 DispatchQueue.main.async {
                     self.shouldShowError(true, error: errorType)
-                    //self.loadingAnimation.stopAnimation()
+                    self.loadingAnimation.stopAnimation()
                 }
             }
         })

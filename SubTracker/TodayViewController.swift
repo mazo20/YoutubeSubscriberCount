@@ -9,25 +9,31 @@
 import UIKit
 import NotificationCenter
 import MobileCoreServices
-import SubscriberCountKit
 
 class TodayViewController: UIViewController, NCWidgetProviding {
     
     @IBOutlet var tableView: UITableView!
     
-    let id = ["UCtinbF-Q-fVthA0qrFQTgXQ", "UCzuvRWjh7k1SZm1RvqvIx4w", "UC-lHJZR3Gqxm24_Vd_AJ5Yw"]
+    let defaults = UserDefaults(suiteName: "group.subscriberProfiles")
+    var images: [Data]?
+    var ids: [String]?
+    var names: [String]?
+    var subs: [String]?
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        tableView.reloadData()
+        images = defaults?.object(forKey: "images") as? [Data]
+        ids = defaults?.object(forKey: "ids") as? [String]
+        names = defaults?.object(forKey: "names") as? [String]
+        subs = defaults?.object(forKey: "subs") as? [String]
+        
+        tableView.allowsSelection = true
         tableView.contentInset.top = -8
         print("reloadData")
         self.extensionContext?.widgetLargestAvailableDisplayMode = .expanded
         
-        self.preferredContentSize = tableView.contentSize
         // Do any additional setup after loading the view from its nib.
     }
-    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
@@ -40,6 +46,7 @@ class TodayViewController: UIViewController, NCWidgetProviding {
         // If there's no update required, use NCUpdateResult.NoData
         // If there's an update, use NCUpdateResult.NewData
         
+        
         print("widget")
         
         completionHandler(NCUpdateResult.newData)
@@ -47,8 +54,15 @@ class TodayViewController: UIViewController, NCWidgetProviding {
     func widgetActiveDisplayModeDidChange(_ activeDisplayMode: NCWidgetDisplayMode, withMaximumSize maxSize: CGSize) {
         if activeDisplayMode == .compact {
             self.preferredContentSize = CGSize(width: 0, height: 95)
+            //self.tableView.separatorStyle = .none
         } else {
-            self.preferredContentSize = tableView.contentSize
+            let count = names?.count
+            if let count = count {
+                self.preferredContentSize = CGSize(width: 0, height: count * 100)
+            } else {
+                self.preferredContentSize = tableView.contentSize
+            }
+            //self.tableView.separatorStyle = .singleLine
         }
     }
     func widgetMarginInsets(forProposedMarginInsets defaultMarginInsets: UIEdgeInsets) -> UIEdgeInsets {
@@ -61,24 +75,58 @@ class TodayViewController: UIViewController, NCWidgetProviding {
 extension TodayViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 3
+        let count = names?.count
+        if let count = count {
+            if count == 0 { return 1 }
+            return count
+        }
+        return 1
     }
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        self.preferredContentSize = tableView.contentSize
         let cell = tableView.dequeueReusableCell(withIdentifier: "SubscriberCell", for: indexPath) as! SubscriberCell
-        YoutubeAPI.parseData(forID: id[indexPath.row], parameters: [.data, .photo], completionHandler: { result -> Void in
-            switch result {
-            case let .success(result):
-                let dict = result as! [String: AnyObject]
-                cell.thumbnailImageView.image = (dict["image"] as! UIImage)
-                cell.thumbnailImageView.layer.cornerRadius = 5
-                cell.thumbnailImageView.clipsToBounds = true
-                cell.channelName.text = (dict["channelName"] as! String)
-                cell.subscriberCount.text = (dict["liveSubscriberCount"] as! String)
-            case let .failure(error):
-                print(error)
-            }
-        })
+        if images?.count == 0 {
+            cell.channelName.text = "Setup required"
+            return cell
+        }
+        if let photo = images?[indexPath.row] {
+            let image = UIImage(data: photo)
+            cell.thumbnailImageView.image = image!
+            cell.thumbnailImageView.layer.cornerRadius = 5
+            cell.thumbnailImageView.clipsToBounds = true
+        }
+        if let subs = subs?[indexPath.row] {
+            cell.subscriberCount.text = subs
+            print(subs)
+            print("test")
+        }
+        if let id = ids?[indexPath.row] {
+            print(id)
+            YoutubeAPI.parseData(forID: id, parameters: [.data], completionHandler: { result -> Void in
+                switch result {
+                case let .success(result):
+                    let dict = result as! [String: AnyObject]
+                    let sub = dict["liveSubscriberCount"] as! String
+                    cell.subscriberCount.text = sub
+                    self.subs?[indexPath.row] = sub
+                    self.defaults?.setValue(self.subs, forKey: "subs")
+                    
+                case let .failure(error):
+                    print(error)
+                }
+            })
+        }
+        if let name = names?[indexPath.row] {
+            cell.channelName.text = name
+            print(name)
+        }
+        
         return cell
+    }
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let url = URL(string: "SubTracker:/\(ids![indexPath.row])")
+        print(indexPath.row)
+        self.extensionContext?.open(url!, completionHandler: nil)
     }
     func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
         return 0.00001

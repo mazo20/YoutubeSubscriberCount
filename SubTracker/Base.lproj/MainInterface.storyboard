@@ -26,7 +26,7 @@
                                 <color key="sectionIndexBackgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="SubscriberCell" id="V0G-gI-1Wn" customClass="SubscriberCell" customModule="SubTracker" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="55.5" width="320" height="100"/>
+                                        <rect key="frame" x="0.0" y="56" width="320" height="100"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="V0G-gI-1Wn" id="TdT-AW-uM4">
                                             <frame key="frameInset" width="320" height="99"/>
@@ -37,14 +37,12 @@
                                                         <constraint firstAttribute="width" secondItem="YoN-1T-Yxf" secondAttribute="height" multiplier="1:1" id="Gha-BZ-ABU"/>
                                                     </constraints>
                                                 </imageView>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="251" misplaced="YES" text="" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vH9-nM-c6b">
-                                                    <frame key="frameInset" minX="280" minY="51"/>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="252" verticalHuggingPriority="251" text="" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vH9-nM-c6b">
                                                     <fontDescription key="fontDescription" type="system" pointSize="18"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xCt-0i-Y9C">
-                                                    <frame key="frameInset" minX="102" minY="51" width="170.5"/>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="251" horizontalCompressionResistancePriority="749" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="16" translatesAutoresizingMaskIntoConstraints="NO" id="xCt-0i-Y9C">
                                                     <fontDescription key="fontDescription" type="system" pointSize="18"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -54,7 +52,7 @@
                                                 <constraint firstItem="YoN-1T-Yxf" firstAttribute="leading" secondItem="TdT-AW-uM4" secondAttribute="leadingMargin" id="9te-eu-a56"/>
                                                 <constraint firstItem="YoN-1T-Yxf" firstAttribute="centerY" secondItem="TdT-AW-uM4" secondAttribute="centerY" id="Og6-Rk-iRI"/>
                                                 <constraint firstItem="xCt-0i-Y9C" firstAttribute="leading" secondItem="YoN-1T-Yxf" secondAttribute="trailing" constant="8" symbolic="YES" id="PEX-fb-ikO"/>
-                                                <constraint firstItem="vH9-nM-c6b" firstAttribute="leading" secondItem="xCt-0i-Y9C" secondAttribute="trailing" constant="8" symbolic="YES" id="Tio-hj-lbM"/>
+                                                <constraint firstItem="vH9-nM-c6b" firstAttribute="leading" secondItem="xCt-0i-Y9C" secondAttribute="trailing" constant="10" id="Tio-hj-lbM"/>
                                                 <constraint firstItem="xCt-0i-Y9C" firstAttribute="baseline" secondItem="vH9-nM-c6b" secondAttribute="baseline" id="V6R-Ii-3O4"/>
                                                 <constraint firstItem="vH9-nM-c6b" firstAttribute="trailing" secondItem="TdT-AW-uM4" secondAttribute="trailingMargin" id="Vhd-sG-ipQ"/>
                                                 <constraint firstItem="YoN-1T-Yxf" firstAttribute="top" secondItem="TdT-AW-uM4" secondAttribute="topMargin" constant="-1" id="bNo-Gh-KwQ"/>
