@@ -1,0 +1,15 @@
+/* 
+  Localizable.strings
+  SubscriberCount
+
+  Created by Maciej Kowalski on 31.10.2016.
+  Copyright © 2016 Maciej Kowalski. All rights reserved.
+*/
+
+"FirstThreeChannels" = "Primeros tres canales se presentarán en un widget";
+"RateOnAppstore" = "Reseñar en AppStore";
+"SuggestNewFunction" = "Sugerir nueva función";
+"ReportABug" = "Reportar un error";
+"AppVersion" = "Version de aplicacion";
+"ShareYourOpinionWithOthers" = "Comparte tu opinión con otras personas";
+"ShareYourOpinionWithTheDeveloper" = "Comparte tu opinión con el desarrollador";

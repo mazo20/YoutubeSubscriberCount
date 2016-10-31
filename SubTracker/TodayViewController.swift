@@ -75,9 +75,7 @@ class TodayViewController: UIViewController, NCWidgetProviding {
 extension TodayViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        let count = names?.count
-        if let count = count {
-            if count == 0 { return 1 }
+        if let count = names?.count, count != 0 {
             return count
         }
         return 1
@@ -97,8 +95,6 @@ extension TodayViewController: UITableViewDelegate, UITableViewDataSource {
         }
         if let subs = subs?[indexPath.row] {
             cell.subscriberCount.text = subs
-            print(subs)
-            print("test")
         }
         if let id = ids?[indexPath.row] {
             print(id)
@@ -110,7 +106,6 @@ extension TodayViewController: UITableViewDelegate, UITableViewDataSource {
                     cell.subscriberCount.text = sub
                     self.subs?[indexPath.row] = sub
                     self.defaults?.setValue(self.subs, forKey: "subs")
-                    
                 case let .failure(error):
                     print(error)
                 }

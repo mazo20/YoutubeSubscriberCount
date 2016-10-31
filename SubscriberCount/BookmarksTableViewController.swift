@@ -96,6 +96,7 @@ extension BookmarksTableViewController: UITableViewDelegate, UITableViewDataSour
         })
     }
     func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
-        return "First three channels will be shown in a widget"
+        let string = NSLocalizedString("FirstThreeChannels", comment: "First three channels will be shown in a widget")
+        return string
     }
 }

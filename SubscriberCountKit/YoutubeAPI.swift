@@ -37,6 +37,13 @@ extension Dictionary {
         }
     }
 }
+extension Int {
+    var stringInDecimal: String? {
+        let numberFormatter = NumberFormatter()
+        numberFormatter.numberStyle = NumberFormatter.Style.decimal
+        return numberFormatter.string(from: NSNumber(integerLiteral: self))
+    }
+}
 
 public struct YoutubeAPI {
     fileprivate static let baseURLString = "https://www.googleapis.com/youtube/v3/"
@@ -68,12 +75,9 @@ public struct YoutubeAPI {
                     if let query = result["query"] as? [String: AnyObject],
                         let results = query["results"] as? [String: AnyObject],
                         let subscribers = results["b"] as? [String],
-                        subscribers.count > 0 {
-                        let number = Int(subscribers[0].replacingOccurrences(of: ",", with: ""))
-                        let numberFormatter = NumberFormatter()
-                        numberFormatter.numberStyle = NumberFormatter.Style.decimal
-                        let s = numberFormatter.string(from: NSNumber(integerLiteral: number!))
-                        completionHandler(.success(s!))
+                        subscribers.count > 0,
+                        let string = Int(subscribers[0].replacingOccurrences(of: ",", with: ""))?.stringInDecimal {
+                        completionHandler(.success(string))
                     } else {
                         completionHandler(.failure(Error.stuckSubError))
                         print("WrongDataFormat")
@@ -136,22 +140,17 @@ public struct YoutubeAPI {
         jsonSerialization(url, completionHandler: { jsonResult -> Void in
             switch jsonResult {
             case let .success(result):
-                let numberFormatter = NumberFormatter()
-                numberFormatter.numberStyle = NumberFormatter.Style.decimal
                 if let items = result["items"] as? [[String: AnyObject]] , items.count > 0 {
                     if let statistics = items[0]["statistics"] as? [String: AnyObject],
                         let subscriberCount = statistics["subscriberCount"] as? String,
-                        let subscriberNumber = Int(subscriberCount),
-                        let finalSubscriber = numberFormatter.string(from: NSNumber(integerLiteral: subscriberNumber)),
+                        let liveSubscriberCount = Int(subscriberCount)?.stringInDecimal,
                         let viewCount = statistics["viewCount"] as? String,
-                        let viewNumber = Int(viewCount),
-                        let finalView = numberFormatter.string(from: NSNumber(integerLiteral: viewNumber)),
+                        let views = Int(viewCount)?.stringInDecimal,
                         let videoCount = statistics["videoCount"] as? String,
-                        let videoNumber = Int(videoCount),
-                        let finalVideo = numberFormatter.string(from: NSNumber(integerLiteral: videoNumber)) {
-                        subscriberDictionary["liveSubscriberCount"] = finalSubscriber
-                        subscriberDictionary["viewCount"] = finalView
-                        subscriberDictionary["videoCount"] = finalVideo
+                        let videos = Int(videoCount)?.stringInDecimal {
+                        subscriberDictionary["liveSubscriberCount"] = liveSubscriberCount
+                        subscriberDictionary["viewCount"] = views
+                        subscriberDictionary["videoCount"] = videos
                     }
                     if let snippet = items[0]["snippet"] as? NSDictionary,
                         let thumbnails = snippet["thumbnails"] as? NSDictionary,
@@ -172,7 +171,7 @@ public struct YoutubeAPI {
         })
     }
     
-    public static func parseAllData(_ forName: String, completionHandler: @escaping (Result<Any>) -> Void) {
+    public static func parseProfile(forName: String, completionHandler: @escaping (Result<Any>) -> Void) {
         idForName(forName, completionHandler: { idResult -> Void in
             switch idResult {
             case let .success(id):
@@ -181,20 +180,15 @@ public struct YoutubeAPI {
                     case let .success(result):
                         completionHandler(.success(result))
                     case let .failure(error):
-                        print(error)
                         switch error {
-                        case Error.jsonError:
-                            completionHandler(.failure(error))
-                        default:
-                            completionHandler(.failure(Error.constructingError))
+                        case Error.jsonError: completionHandler(.failure(error))
+                        default: completionHandler(.failure(Error.constructingError))
                         }
                     }
                 })
             case let .failure(error):
-                print(error)
                 switch error {
-                case Error.idError:
-                    completionHandler(.failure(error))
+                case Error.idError: completionHandler(.failure(error))
                 default:
                     completionHandler(.failure(Error.constructingError))
                 }
@@ -208,10 +202,8 @@ public struct YoutubeAPI {
             group.enter()
             fetchYoutubeData(forID: id, parameters: parameters, completionHandler: { dataResult -> Void in
                 switch dataResult {
-                case let .success(result):
-                    subscriberDictionary.merge(result)
-                case let .failure(error):
-                    print(error)
+                case let .success(result): subscriberDictionary.merge(result)
+                case let .failure(error): print(error)
                 }
                 group.leave()
             })
@@ -220,16 +212,14 @@ public struct YoutubeAPI {
             group.enter()
             stuckSubscriberCountForId(id, completionHandler: { subsResult -> Void in
                 switch subsResult {
-                case let .success(result):
-                    subscriberDictionary["stuckSubscriberCount"] = result
-                case let .failure(error):
-                    print(error)
+                case let .success(result): subscriberDictionary["stuckSubscriberCount"] = result
+                case let .failure(error): print(error)
                 }
                 group.leave()
             })
         }
         group.notify(queue: DispatchQueue.main) {
-            subscriberDictionary["id"] = id as AnyObject?
+            subscriberDictionary["id"] = id
             if subscriberDictionary["stuckSubscriberCount"] == nil && parameters.count == 3{
                 if let live = subscriberDictionary["liveSubscriberCount"] as? String {
                     subscriberDictionary["stuckSubscriberCount"] = live

@@ -1,0 +1,39 @@
+
+/* Class = "UIBarButtonItem"; title = "Edit"; ObjectID = "51D-nY-yNs"; */
+"51D-nY-yNs.title" = "Edytuj";
+
+/* Class = "UIViewController"; title = "LiveSubscriberCount"; ObjectID = "BYZ-38-t0r"; */
+"BYZ-38-t0r.title" = "LiveSubscriberCount";
+
+/* Class = "UILabel"; text = "13,213,124,535"; ObjectID = "Nav-00-ymY"; */
+"Nav-00-ymY.text" = "13,213,124,535";
+
+/* Class = "UILabel"; text = "650"; ObjectID = "PxI-u4-JXk"; */
+"PxI-u4-JXk.text" = "650";
+
+/* Class = "UILabel"; text = "Jan Franciszek Adamski"; ObjectID = "QJS-OM-rRQ"; */
+"QJS-OM-rRQ.text" = "Jan Franciszek Adamski";
+
+/* Class = "UILabel"; text = "Text"; ObjectID = "Qtc-0z-s2N"; */
+"Qtc-0z-s2N.text" = "Text";
+
+/* Class = "UINavigationItem"; title = "About"; ObjectID = "SML-6N-0Xs"; */
+"SML-6N-0Xs.title" = "O aplikacji";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "Suz-wq-j2P"; */
+"Suz-wq-j2P.text" = "Title";
+
+/* Class = "UINavigationItem"; title = "Bookmarks"; ObjectID = "eDz-Xj-x3N"; */
+"eDz-Xj-x3N.title" = "Zakładki";
+
+/* Class = "UITextField"; placeholder = "e.g. PewDiePie"; ObjectID = "jUU-cx-RU7"; */
+"jUU-cx-RU7.placeholder" = "np. PewDiePie";
+
+/* Class = "UILabel"; text = "47,124,513"; ObjectID = "kRG-Qn-d5J"; */
+"kRG-Qn-d5J.text" = "47,124,513";
+
+/* Class = "UILabel"; text = "47,123,124"; ObjectID = "rC2-RI-HtT"; */
+"rC2-RI-HtT.text" = "47,123,124";
+
+/* Class = "UINavigationItem"; title = "SubTracker"; ObjectID = "ztD-XZ-5d4"; */
+"ztD-XZ-5d4.title" = "SubTracker";

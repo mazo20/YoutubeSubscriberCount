@@ -25,7 +25,6 @@ class SubscriberCountViewController: UIViewController{
             return [String: String]()
         }
     }
-    //var idStore = [String: String]()
     
     @IBOutlet var thumbnailImageView: UIImageView!
     @IBOutlet var channelNameLabel: UILabel!
@@ -128,11 +127,12 @@ class SubscriberCountViewController: UIViewController{
         self.view.sendSubview(toBack: imageView)
         visualEffect.effect = UIBlurEffect(style: UIBlurEffectStyle.light)
         
-        thumbnailImageView.bounds.size = CGSize(width: self.view.bounds.size.width/3, height: self.view.bounds.size.width/3)
+        thumbnailImageView.frame.size = CGSize(width: self.view.bounds.size.width/3, height: self.view.bounds.size.width/3)
         thumbnailImageView.layer.cornerRadius = 10
         thumbnailImageView.layer.borderWidth = 1
         thumbnailImageView.layer.borderColor = UIColor.black.cgColor
         thumbnailImageView.clipsToBounds = true
+        
         
         _ = Timer.scheduledTimer(timeInterval: 30, target: self, selector: #selector(self.updateStuckSubscriberCount), userInfo: nil, repeats: true)
         if showNewProfile {
@@ -253,7 +253,7 @@ class SubscriberCountViewController: UIViewController{
         if let id = idStore[name] {
             newName = id
         }
-        YoutubeAPI.parseAllData(newName, completionHandler: { result -> Void in
+        YoutubeAPI.parseProfile(forName: newName, completionHandler: { result -> Void in
             switch result {
             case let .success(result):
                 DispatchQueue.main.async {
@@ -266,7 +266,6 @@ class SubscriberCountViewController: UIViewController{
                         UserDefaults.standard.set(store, forKey: "idStore")
                     }
                     if let profile = self.store.store.filter({ $0.id == subscriberDictionary["id"] as! String }).first {
-                        print(profile)
                         profile.image = subscriberDictionary["image"] as! UIImage
                         profile.channelName = subscriberDictionary["channelName"] as! String
                         profile.subscriberCount = subscriberDictionary["liveSubscriberCount"] as! String
@@ -307,9 +306,8 @@ class SubscriberCountViewController: UIViewController{
                 }
             case let .failure(error):
                 print(error)
-                let errorType = error
                 DispatchQueue.main.async {
-                    self.shouldShowError(true, error: errorType)
+                    self.shouldShowError(true, error: error)
                     self.loadingAnimation.stopAnimation()
                 }
             }
@@ -319,10 +317,8 @@ class SubscriberCountViewController: UIViewController{
     func updateLiveSubscriberCount() {
         YoutubeAPI.parseData(forID: Public.id, parameters: [.data], completionHandler: { result -> Void in
             switch result {
-            case let .success(result):
-                self.updateView(withValues: result)
-            case let .failure(error):
-                print(error)
+            case let .success(result): self.updateView(withValues: result)
+            case let .failure(error): print(error)
             }
         })
     }
@@ -330,10 +326,8 @@ class SubscriberCountViewController: UIViewController{
     func updateStuckSubscriberCount() {
         YoutubeAPI.parseData(forID: Public.id, parameters: [.stuckSubscriberCount], completionHandler: { result -> Void in
             switch result {
-            case let .success(result):
-                self.updateView(withValues: result)
-            case let .failure(error):
-                print(error)
+            case let .success(result): self.updateView(withValues: result)
+            case let .failure(error): print(error)
             }
         })
     }
@@ -358,8 +352,6 @@ class SubscriberCountViewController: UIViewController{
             bookmarksViewController.delegate = self
         }
     }
-    
-    
 }
 
 extension SubscriberCountViewController: UITextFieldDelegate {
