@@ -145,7 +145,6 @@ class SubscriberCountViewController: UIViewController{
         
     }
     
-    
     override func viewWillAppear(_ animated: Bool) {
         updateBookmark()
     }
@@ -183,11 +182,9 @@ class SubscriberCountViewController: UIViewController{
         
         activityViewController.excludedActivityTypes = [
             UIActivityType.postToWeibo,
-            UIActivityType.mail,
             UIActivityType.airDrop,
             UIActivityType.print,
             UIActivityType.assignToContact,
-            UIActivityType.saveToCameraRoll,
             UIActivityType.addToReadingList,
             UIActivityType.postToFlickr,
             UIActivityType.postToVimeo,
@@ -212,7 +209,6 @@ class SubscriberCountViewController: UIViewController{
                 self.store.store.remove(at: index!)
                 self.bookmarkButton.image = UIImage(imageLiteralResourceName: "Bookmark.png")
             }
-            
         } else {
             if changeState == nil {
                 self.bookmarkButton.image = UIImage(imageLiteralResourceName: "Bookmark.png")
@@ -324,7 +320,7 @@ class SubscriberCountViewController: UIViewController{
         YoutubeAPI.parseData(forID: Public.id, parameters: [.data], completionHandler: { result -> Void in
             switch result {
             case let .success(result):
-                self.updateView(withValues: result as! [String: AnyObject])
+                self.updateView(withValues: result)
             case let .failure(error):
                 print(error)
             }
@@ -335,14 +331,14 @@ class SubscriberCountViewController: UIViewController{
         YoutubeAPI.parseData(forID: Public.id, parameters: [.stuckSubscriberCount], completionHandler: { result -> Void in
             switch result {
             case let .success(result):
-                self.updateView(withValues: result as! [String: AnyObject])
+                self.updateView(withValues: result)
             case let .failure(error):
                 print(error)
             }
         })
     }
     
-    func updateView(withValues values: [String: AnyObject]) {
+    func updateView(withValues values: [String: Any]) {
         if let channel = values["channelName"] as? String  { self.channelNameLabel.text = channel }
         if let liveSubCount = values["liveSubscriberCount"] as? String { self.liveSubscriberCountLabel.text = liveSubCount }
         if let stuckSubCount = values["stuckSubscriberCount"] as? String { self.stuckSubscriberCountLabel.text = stuckSubCount }

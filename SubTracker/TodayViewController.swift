@@ -105,7 +105,7 @@ extension TodayViewController: UITableViewDelegate, UITableViewDataSource {
             YoutubeAPI.parseData(forID: id, parameters: [.data], completionHandler: { result -> Void in
                 switch result {
                 case let .success(result):
-                    let dict = result as! [String: AnyObject]
+                    let dict = result
                     let sub = dict["liveSubscriberCount"] as! String
                     cell.subscriberCount.text = sub
                     self.subs?[indexPath.row] = sub

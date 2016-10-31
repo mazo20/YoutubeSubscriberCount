@@ -12,11 +12,11 @@ enum Method: String {
     case Search = "search?"
     case Channels = "channels?"
 }
-public enum Result {
-    case success(AnyObject)
+public enum Result<T> {
+    case success(T)
     case failure(Error)
 }
-public enum Error {
+public enum Error: String {
     case photoError
     case stuckSubError
     case dataError
@@ -60,22 +60,20 @@ public struct YoutubeAPI {
         return components.url!
     }
     
-    static func stuckSubscriberCountForId(_ id: String, completionHandler: @escaping (Result) -> Void ) {
+    static func stuckSubscriberCountForId(_ id: String, completionHandler: @escaping (Result<String>) -> Void ) {
         if let url = URL(string: "https://query.yahooapis.com/v1/public/yql?q=SELECT%20*%20FROM%20html%20where%20url%3D%22https%3A%2F%2Fwww.youtube.com%2Fchannel%2F\(id)%2Fabout%22%20%0AAND%20xpath%3D'%2F%2F*%5B%40class%3D%22about-stats%22%5D%2F%2Fb'&format=json") {
             jsonSerialization(url, completionHandler: { dataResult -> Void in
                 switch dataResult {
                 case let .success(result):
                     if let query = result["query"] as? [String: AnyObject],
                         let results = query["results"] as? [String: AnyObject],
-                        let subscribers = results["b"] as? [String] , subscribers.count > 0 {
-                        var numberText = subscribers[0]
-                        numberText = numberText.replacingOccurrences(of: ",", with: "")
-                        if let number = Int(numberText) {
-                            let numberFormatter = NumberFormatter()
-                            numberFormatter.numberStyle = NumberFormatter.Style.decimal
-                            let s = numberFormatter.string(from: NSNumber(integerLiteral: number))
-                            completionHandler(.success(s! as AnyObject))
-                        }
+                        let subscribers = results["b"] as? [String],
+                        subscribers.count > 0 {
+                        let number = Int(subscribers[0].replacingOccurrences(of: ",", with: ""))
+                        let numberFormatter = NumberFormatter()
+                        numberFormatter.numberStyle = NumberFormatter.Style.decimal
+                        let s = numberFormatter.string(from: NSNumber(integerLiteral: number!))
+                        completionHandler(.success(s!))
                     } else {
                         completionHandler(.failure(Error.stuckSubError))
                         print("WrongDataFormat")
@@ -88,10 +86,10 @@ public struct YoutubeAPI {
         }
     }
     
-    static func idForName(_ name: String, completionHandler: @escaping (Result) -> Void ){
+    static func idForName(_ name: String, completionHandler: @escaping (Result<String>) -> Void ){
         if name.characters.count == 24 {
             print("ID already known")
-            completionHandler(.success(name as AnyObject))
+            completionHandler(.success(name))
         } else {
             let url = youtubeURL(method: .Search, part: ["snippet"], parameters: ["q": name, "type": "channel"])
             jsonSerialization(url, completionHandler: { dataResult -> Void in
@@ -102,7 +100,7 @@ public struct YoutubeAPI {
                         let items = result["items"] as? [[String:AnyObject]] , items.count > 0,
                         let snippet = items[0]["snippet"] as? NSDictionary,
                         let id = snippet["channelId"] as? String {
-                        completionHandler(.success(id as AnyObject))
+                        completionHandler(.success(id))
                     } else {
                         completionHandler(.failure(Error.idError))
                     }
@@ -114,11 +112,11 @@ public struct YoutubeAPI {
         }
     }
     
-    static func jsonSerialization(_ url: URL, completionHandler: @escaping (Result) -> Void) {
+    static func jsonSerialization(_ url: URL, completionHandler: @escaping (Result<[String: AnyObject]>) -> Void) {
         let task = URLSession.shared.dataTask(with: url, completionHandler: { (data, response, error) -> Void in
             do {
                 if let myData = data, let result = try JSONSerialization.jsonObject(with: myData, options: JSONSerialization.ReadingOptions.allowFragments) as? [String: AnyObject] {
-                    completionHandler(.success(result as AnyObject))
+                    completionHandler(.success(result))
                 } else {
                     completionHandler(.failure(Error.jsonError))
                 }
@@ -128,8 +126,8 @@ public struct YoutubeAPI {
         })
         task.resume()
     }
-    static func fetchYoutubeData(forID id: String, parameters: [DataParameters], completionHandler: @escaping (Result) -> Void) {
-        var subscriberDictionary = [String: AnyObject]()
+    static func fetchYoutubeData(forID id: String, parameters: [DataParameters], completionHandler: @escaping (Result<[String: Any]>) -> Void) {
+        var subscriberDictionary = [String: Any]()
         var part = ["statistics"]
         if parameters.contains(.photo) {
             part.append("snippet")
@@ -151,22 +149,22 @@ public struct YoutubeAPI {
                         let videoCount = statistics["videoCount"] as? String,
                         let videoNumber = Int(videoCount),
                         let finalVideo = numberFormatter.string(from: NSNumber(integerLiteral: videoNumber)) {
-                        subscriberDictionary["liveSubscriberCount"] = finalSubscriber as AnyObject?
-                        subscriberDictionary["viewCount"] = finalView as AnyObject?
-                        subscriberDictionary["videoCount"] = finalVideo as AnyObject?
+                        subscriberDictionary["liveSubscriberCount"] = finalSubscriber
+                        subscriberDictionary["viewCount"] = finalView
+                        subscriberDictionary["videoCount"] = finalVideo
                     }
                     if let snippet = items[0]["snippet"] as? NSDictionary,
                         let thumbnails = snippet["thumbnails"] as? NSDictionary,
                         let image = thumbnails["medium"] as? NSDictionary,
                         let urlString = image["url"] as? String,
-                        let title = snippet["title"] as? String {
-                        let url = URL(string: urlString)
-                        let imageData = try? Data(contentsOf: url!)
-                        subscriberDictionary["image"] = UIImage(data: imageData!)
-                        subscriberDictionary["channelName"] = title as AnyObject?
+                        let title = snippet["title"] as? String,
+                        let url = URL(string: urlString),
+                        let imageData = try? Data(contentsOf: url) {
+                        subscriberDictionary["image"] = UIImage(data: imageData)
+                        subscriberDictionary["channelName"] = title
                     }
                 }
-                completionHandler(.success(subscriberDictionary as AnyObject))
+                completionHandler(.success(subscriberDictionary))
             case let .failure(error):
                 print(error)
                 completionHandler(.failure(error))
@@ -174,15 +172,14 @@ public struct YoutubeAPI {
         })
     }
     
-    public static func parseAllData(_ forName: String, completionHandler: @escaping (Result) -> Void) {
+    public static func parseAllData(_ forName: String, completionHandler: @escaping (Result<Any>) -> Void) {
         idForName(forName, completionHandler: { idResult -> Void in
             switch idResult {
-            case let .success(result):
-                let id = result as! String
+            case let .success(id):
                 parseData(forID: id, parameters: [.data, .photo, .stuckSubscriberCount], completionHandler: { dataResult -> Void in
                     switch dataResult {
                     case let .success(result):
-                        completionHandler(.success(result as! [String: AnyObject] as AnyObject))
+                        completionHandler(.success(result))
                     case let .failure(error):
                         print(error)
                         switch error {
@@ -204,20 +201,19 @@ public struct YoutubeAPI {
             }
         })
     }
-    public static func parseData(forID id: String, parameters: [DataParameters], completionHandler: @escaping (Result) -> Void) {
-        var subscriberDictionary = [String: AnyObject]()
+    public static func parseData(forID id: String, parameters: [DataParameters], completionHandler: @escaping (Result<[String: Any]>) -> Void) {
+        var subscriberDictionary = [String: Any]()
         let group = DispatchGroup()
         if parameters.contains(.data) {
             group.enter()
             fetchYoutubeData(forID: id, parameters: parameters, completionHandler: { dataResult -> Void in
                 switch dataResult {
                 case let .success(result):
-                    subscriberDictionary.merge(result as! [String: AnyObject])
-                    group.leave()
+                    subscriberDictionary.merge(result)
                 case let .failure(error):
                     print(error)
-                    group.leave()
                 }
+                group.leave()
             })
         }
         if parameters.contains(.stuckSubscriberCount) {
@@ -225,31 +221,25 @@ public struct YoutubeAPI {
             stuckSubscriberCountForId(id, completionHandler: { subsResult -> Void in
                 switch subsResult {
                 case let .success(result):
-                    subscriberDictionary["stuckSubscriberCount"] = result as! String as AnyObject?
-                    group.leave()
+                    subscriberDictionary["stuckSubscriberCount"] = result
                 case let .failure(error):
                     print(error)
-                    group.leave()
                 }
+                group.leave()
             })
         }
         group.notify(queue: DispatchQueue.main) {
             subscriberDictionary["id"] = id as AnyObject?
             if subscriberDictionary["stuckSubscriberCount"] == nil && parameters.count == 3{
                 if let live = subscriberDictionary["liveSubscriberCount"] as? String {
-                    subscriberDictionary["stuckSubscriberCount"] = live as AnyObject?
+                    subscriberDictionary["stuckSubscriberCount"] = live
                 }
             }
-            if parameters.count == 3 {
-                if subscriberDictionary.count == 7 {
-                    completionHandler(.success(subscriberDictionary as AnyObject))
-                } else {
-                    completionHandler(.failure(Error.constructingError))
-                }
+            if parameters.count == 3 && subscriberDictionary.count != 7 {
+                completionHandler(.failure(Error.constructingError))
             } else {
-                completionHandler(.success(subscriberDictionary as AnyObject))
+                completionHandler(.success(subscriberDictionary))
             }
-            
         }
     }
 }
