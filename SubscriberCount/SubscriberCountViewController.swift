@@ -29,7 +29,6 @@ class SubscriberCountViewController: UIViewController{
     @IBOutlet var thumbnailImageView: UIImageView!
     @IBOutlet var channelNameLabel: UILabel!
     @IBOutlet var liveSubscriberCountLabel: UILabel!
-    @IBOutlet var stuckSubscriberCountLabel: UILabel!
     @IBOutlet var videoCountLabel: UILabel!
     @IBOutlet var viewsCountLabel: UILabel!
     @IBOutlet var searchTextField: UITextField!
@@ -44,6 +43,7 @@ class SubscriberCountViewController: UIViewController{
     var timer: Timer?
     var repeatButton: UIButton!
     var name = ""
+    var peekID: String?
     var textFieldShouldBecomeFirstResponder = false
     
     override func restoreUserActivityState(_ activity: NSUserActivity) {
@@ -133,20 +133,22 @@ class SubscriberCountViewController: UIViewController{
         thumbnailImageView.layer.borderColor = UIColor.black.cgColor
         thumbnailImageView.clipsToBounds = true
         
-        
-        _ = Timer.scheduledTimer(timeInterval: 30, target: self, selector: #selector(self.updateStuckSubscriberCount), userInfo: nil, repeats: true)
         if showNewProfile {
-            if store.store.count > 0 {
-                newProfile(withName: store.store[0].id)
+            if peekID != nil {
+                name = peekID!
+            } else if store.store.count > 0 {
+                name = store.store[0].id
             } else {
-                newProfile(withName: Public.id)
+                name = Public.id
             }
+            newProfile(withName: name)
+            print("newprofilecalled")
         }
-        
     }
     
     override func viewWillAppear(_ animated: Bool) {
         updateBookmark()
+        
     }
     
     @IBAction func tapGestureRecognizer(_ sender: AnyObject) {
@@ -156,6 +158,8 @@ class SubscriberCountViewController: UIViewController{
     @IBAction func shareButton(_ sender: AnyObject) {
         guard !self.stackView.isHidden else { return }
         let firstActivityItem = "\(self.channelNameLabel.text!) subscriber count is \(self.liveSubscriberCountLabel.text!) - via SubTracker. Download at http://tinyurl.com/hljn24l"
+        
+        
         
         
         let window = UIApplication.shared.delegate!.window!!
@@ -229,7 +233,6 @@ class SubscriberCountViewController: UIViewController{
                 default:
                     self.repeatLabel.isHidden = false
                     self.repeatButton.isHidden = false
-                    
                 }
             }
         } else {
@@ -244,6 +247,8 @@ class SubscriberCountViewController: UIViewController{
     }
     
     func newProfile(withName name: String) {
+        print("newprofile")
+        self.name = name
         timer?.invalidate()
         timer = nil
         shouldShowError(false)
@@ -256,6 +261,7 @@ class SubscriberCountViewController: UIViewController{
         YoutubeAPI.parseProfile(forName: newName, completionHandler: { result -> Void in
             switch result {
             case let .success(result):
+                print("success")
                 DispatchQueue.main.async {
                     let subscriberDictionary = result as! [String: AnyObject]
                     self.updateView(withValues: subscriberDictionary)
@@ -301,7 +307,10 @@ class SubscriberCountViewController: UIViewController{
                     self.stackView.isHidden = false
                     Public.id = subscriberDictionary["id"] as! String
                     self.updateBookmark()
-                    self.timer = Timer.scheduledTimer(timeInterval: timer, target: self, selector: #selector(self.updateLiveSubscriberCount), userInfo: nil, repeats: true)
+                    if self.peekID == nil {
+                        self.timer = Timer.scheduledTimer(timeInterval: timer, target: self, selector: #selector(self.updateLiveSubscriberCount), userInfo: nil, repeats: true)
+                    }
+                    
                     self.loadingAnimation.stopAnimation()
                 }
             case let .failure(error):
@@ -315,16 +324,9 @@ class SubscriberCountViewController: UIViewController{
     }
     
     func updateLiveSubscriberCount() {
-        YoutubeAPI.parseData(forID: Public.id, parameters: [.data], completionHandler: { result -> Void in
-            switch result {
-            case let .success(result): self.updateView(withValues: result)
-            case let .failure(error): print(error)
-            }
-        })
-    }
-    
-    func updateStuckSubscriberCount() {
-        YoutubeAPI.parseData(forID: Public.id, parameters: [.stuckSubscriberCount], completionHandler: { result -> Void in
+        print(Date())
+        print(channelNameLabel.text!)
+        YoutubeAPI.fetchYoutubeData(forID: Public.id, parameters: [.data], completionHandler: { result -> Void in
             switch result {
             case let .success(result): self.updateView(withValues: result)
             case let .failure(error): print(error)
@@ -333,9 +335,9 @@ class SubscriberCountViewController: UIViewController{
     }
     
     func updateView(withValues values: [String: Any]) {
+        print("update")
         if let channel = values["channelName"] as? String  { self.channelNameLabel.text = channel }
         if let liveSubCount = values["liveSubscriberCount"] as? String { self.liveSubscriberCountLabel.text = liveSubCount }
-        if let stuckSubCount = values["stuckSubscriberCount"] as? String { self.stuckSubscriberCountLabel.text = stuckSubCount }
         if let views = values["viewCount"] as? String { self.viewsCountLabel.text = views }
         if let videos = values["videoCount"] as? String { self.videoCountLabel.text = videos }
         if let image = values["image"] as? UIImage {
@@ -349,6 +351,7 @@ class SubscriberCountViewController: UIViewController{
             let navController = segue.destination as! UINavigationController
             let bookmarksViewController = navController.topViewController as! BookmarksTableViewController
             bookmarksViewController.store = self.store
+            bookmarksViewController.previousProfile = Public.id
             bookmarksViewController.delegate = self
         }
     }
@@ -361,6 +364,13 @@ extension SubscriberCountViewController: UITextFieldDelegate {
         }
         textFieldShouldBecomeFirstResponder = true
     }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        name = textField.text!
+        newProfile(withName: name)
+        return false
+    }
 }
 
 extension SubscriberCountViewController: SendIdDelegate {
@@ -368,12 +378,5 @@ extension SubscriberCountViewController: SendIdDelegate {
         name = data
         newProfile(withName: name)
         searchTextField.text = ""
-    }
-    
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        textField.resignFirstResponder()
-        name = textField.text!
-        newProfile(withName: name)
-        return false
     }
 }

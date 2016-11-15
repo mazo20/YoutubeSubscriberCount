@@ -96,13 +96,17 @@ extension TodayViewController: UITableViewDelegate, UITableViewDataSource {
         if let subs = subs?[indexPath.row] {
             cell.subscriberCount.text = subs
         }
+        if let name = names?[indexPath.row] {
+            cell.channelName.text = name
+            print(name)
+        }
         if let id = ids?[indexPath.row] {
             print(id)
-            YoutubeAPI.parseData(forID: id, parameters: [.data], completionHandler: { result -> Void in
+            YoutubeAPI.fetchYoutubeData(forID: id, parameters: [.data], completionHandler: { result -> Void in
                 switch result {
                 case let .success(result):
                     let dict = result
-                    let sub = dict["liveSubscriberCount"] as! String
+                    guard let sub = dict["liveSubscriberCount"] as? String else { return }
                     cell.subscriberCount.text = sub
                     self.subs?[indexPath.row] = sub
                     self.defaults?.setValue(self.subs, forKey: "subs")
@@ -111,10 +115,7 @@ extension TodayViewController: UITableViewDelegate, UITableViewDataSource {
                 }
             })
         }
-        if let name = names?[indexPath.row] {
-            cell.channelName.text = name
-            print(name)
-        }
+        
         
         return cell
     }

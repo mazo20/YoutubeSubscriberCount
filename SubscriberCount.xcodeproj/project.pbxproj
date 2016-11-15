@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		542366C01D7AFA1C00B823E4 /* Synchronize.png in Resources */ = {isa = PBXBuildFile; fileRef = 542366BF1D7AFA1C00B823E4 /* Synchronize.png */; };
+		542726DE1DCA5A7D0058C6E0 /* LaunchIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 542726DD1DCA5A7D0058C6E0 /* LaunchIcon.png */; };
 		54427DF81D8491A2002B5EBC /* NotificationCenter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 54427DF71D8491A2002B5EBC /* NotificationCenter.framework */; };
 		54427DFB1D8491A2002B5EBC /* TodayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54427DFA1D8491A2002B5EBC /* TodayViewController.swift */; };
 		54427DFE1D8491A2002B5EBC /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 54427DFC1D8491A2002B5EBC /* MainInterface.storyboard */; };
@@ -27,7 +28,6 @@
 		548890491D76DB5D00C69B72 /* SubscriberProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 548890481D76DB5D00C69B72 /* SubscriberProfile.swift */; };
 		54A5E4301DB54CFC00DC2834 /* SubscriberCount.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = 54CEA1971D84942400719257 /* SubscriberCount.entitlements */; };
 		54B002BE1D8B377000A491F2 /* icon60@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 54B002BD1D8B377000A491F2 /* icon60@2x.png */; };
-		54B002C61D8D8E2700A491F2 /* icon_b&w_launch.png in Resources */ = {isa = PBXBuildFile; fileRef = 54B002C51D8D8E2700A491F2 /* icon_b&w_launch.png */; };
 		54B002C81D8EAEFC00A491F2 /* YoutubeAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54CEA1A21D867B1800719257 /* YoutubeAPI.swift */; };
 		54B002C91D8EAEFD00A491F2 /* YoutubeAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54CEA1A21D867B1800719257 /* YoutubeAPI.swift */; };
 		54B002CD1D8FC6AE00A491F2 /* Bookmark@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 54B002CC1D8FC6AE00A491F2 /* Bookmark@2x.png */; };
@@ -130,6 +130,10 @@
 
 /* Begin PBXFileReference section */
 		542366BF1D7AFA1C00B823E4 /* Synchronize.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Synchronize.png; sourceTree = "<group>"; };
+		542726D81DCA592C0058C6E0 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
+		542726DA1DCA59310058C6E0 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
+		542726DC1DCA59330058C6E0 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
+		542726DD1DCA5A7D0058C6E0 /* LaunchIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = LaunchIcon.png; sourceTree = "<group>"; };
 		54427DF61D8491A2002B5EBC /* SubTracker.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = SubTracker.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		54427DF71D8491A2002B5EBC /* NotificationCenter.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NotificationCenter.framework; path = System/Library/Frameworks/NotificationCenter.framework; sourceTree = SDKROOT; };
 		54427DFA1D8491A2002B5EBC /* TodayViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayViewController.swift; sourceTree = "<group>"; };
@@ -156,7 +160,6 @@
 		5488903C1D75A76F00C69B72 /* YouTubeIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = YouTubeIcon.png; sourceTree = "<group>"; };
 		548890481D76DB5D00C69B72 /* SubscriberProfile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubscriberProfile.swift; sourceTree = "<group>"; };
 		54B002BD1D8B377000A491F2 /* icon60@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon60@2x.png"; sourceTree = "<group>"; };
-		54B002C51D8D8E2700A491F2 /* icon_b&w_launch.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon_b&w_launch.png"; sourceTree = "<group>"; };
 		54B002CC1D8FC6AE00A491F2 /* Bookmark@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Bookmark@2x.png"; sourceTree = "<group>"; };
 		54B002CE1D8FC73100A491F2 /* Bookmark@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Bookmark@3x.png"; sourceTree = "<group>"; };
 		54B002D11D8FC7C400A491F2 /* Share@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Share@3x.png"; sourceTree = "<group>"; };
@@ -329,7 +332,7 @@
 		54CEA1A11D85F8A700719257 /* OtherIcons */ = {
 			isa = PBXGroup;
 			children = (
-				54B002C51D8D8E2700A491F2 /* icon_b&w_launch.png */,
+				542726DD1DCA5A7D0058C6E0 /* LaunchIcon.png */,
 				54CEA19F1D8595A400719257 /* BookmarkIcon.png */,
 				548890381D75A76F00C69B72 /* VideoCallIcon.png */,
 				5488903A1D75A76F00C69B72 /* EyeIcon.png */,
@@ -521,6 +524,7 @@
 				54FA8D3D1D78A16200570D61 /* Menu@2x.png in Resources */,
 				54A5E4301DB54CFC00DC2834 /* SubscriberCount.entitlements in Resources */,
 				54CEA1A01D8595A400719257 /* BookmarkIcon.png in Resources */,
+				542726DE1DCA5A7D0058C6E0 /* LaunchIcon.png in Resources */,
 				54FA8D3F1D78A1A600570D61 /* Share@2x.png in Resources */,
 				54B003091D90484700A491F2 /* icon40@1x.png in Resources */,
 				54B003081D90484700A491F2 /* icon29@3x.png in Resources */,
@@ -549,7 +553,6 @@
 				54B003171D90485200A491F2 /* icon20@2x.png in Resources */,
 				54B0031A1D90485200A491F2 /* icon20@1x.png in Resources */,
 				548890121D755EA300C69B72 /* Main.storyboard in Resources */,
-				54B002C61D8D8E2700A491F2 /* icon_b&w_launch.png in Resources */,
 				54B0031C1D90485200A491F2 /* icon76@1x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -662,6 +665,9 @@
 			isa = PBXVariantGroup;
 			children = (
 				548890161D755EA300C69B72 /* Base */,
+				542726D81DCA592C0058C6E0 /* en */,
+				542726DA1DCA59310058C6E0 /* es */,
+				542726DC1DCA59330058C6E0 /* pl */,
 			);
 			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";

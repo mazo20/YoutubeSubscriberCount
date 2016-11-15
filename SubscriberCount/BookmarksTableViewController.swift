@@ -18,19 +18,28 @@ class BookmarksTableViewController: UIViewController {
     
     var store: SubscriberProfileStore!
     weak var delegate: SendIdDelegate?
+    var previousProfile: String!
+    var didPreview = false
     
     @IBOutlet var editButton: UIBarButtonItem!
     @IBOutlet var tableView: UITableView!
     
     @IBAction func editButton(_ sender: AnyObject) {
-        editButton.title = tableView.isEditing == true ? "Edit" : "Done"
+        editButton.title = tableView.isEditing == true ? NSLocalizedString("Edit", comment: "Edit") : NSLocalizedString("Done", comment: "Done")
         tableView.setEditing(!tableView.isEditing, animated: true)
     }
     
     @IBAction func cancelButton(_ sender: AnyObject) {
+        if didPreview {
+            self.delegate?.sendData(previousProfile)
+        }
         self.dismiss(animated: true, completion: nil)
     }
     override func viewDidLoad() {
+        if traitCollection.forceTouchCapability == .available {
+            registerForPreviewing(with: self, sourceView: view)
+        }
+        
         var searchableItems = [CSSearchableItem]()
         for profile in store.store {
             let searchableItemAttributeSet = CSSearchableItemAttributeSet(itemContentType: kUTTypeText as String)
@@ -98,5 +107,25 @@ extension BookmarksTableViewController: UITableViewDelegate, UITableViewDataSour
     func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
         let string = NSLocalizedString("FirstThreeChannels", comment: "First three channels will be shown in a widget")
         return string
+    }
+}
+
+extension BookmarksTableViewController: UIViewControllerPreviewingDelegate {
+    func previewingContext(_ previewingContext: UIViewControllerPreviewing, commit viewControllerToCommit: UIViewController) {
+        dismiss(animated: true, completion: nil)
+    }
+    func previewingContext(_ previewingContext: UIViewControllerPreviewing, viewControllerForLocation location: CGPoint) -> UIViewController? {
+        didPreview = true
+        guard let indexPath = tableView.indexPathForRow(at: location),
+            let cell = tableView.cellForRow(at: indexPath),
+            let mainVC = storyboard?.instantiateViewController(withIdentifier: "MainViewController") as? SubscriberCountViewController else {return nil}
+        let selectedProfilesId = store.store[indexPath.row].id
+        
+        mainVC.store = store
+        mainVC.timer?.invalidate()
+        mainVC.peekID = selectedProfilesId!
+        self.delegate?.sendData(selectedProfilesId!)
+        previewingContext.sourceRect = cell.frame
+        return mainVC
     }
 }

@@ -27,16 +27,8 @@ public enum Error: String {
 public enum DataParameters {
     case photo
     case data
-    case stuckSubscriberCount
 }
 
-extension Dictionary {
-    mutating func merge<K, V>(_ dict: [K: V]){
-        for (k, v) in dict {
-            self.updateValue(v as! Value, forKey: k as! Key)
-        }
-    }
-}
 extension Int {
     var stringInDecimal: String? {
         let numberFormatter = NumberFormatter()
@@ -65,29 +57,6 @@ public struct YoutubeAPI {
         components.queryItems = queryItems
         
         return components.url!
-    }
-    
-    static func stuckSubscriberCountForId(_ id: String, completionHandler: @escaping (Result<String>) -> Void ) {
-        if let url = URL(string: "https://query.yahooapis.com/v1/public/yql?q=SELECT%20*%20FROM%20html%20where%20url%3D%22https%3A%2F%2Fwww.youtube.com%2Fchannel%2F\(id)%2Fabout%22%20%0AAND%20xpath%3D'%2F%2F*%5B%40class%3D%22about-stats%22%5D%2F%2Fb'&format=json") {
-            jsonSerialization(url, completionHandler: { dataResult -> Void in
-                switch dataResult {
-                case let .success(result):
-                    if let query = result["query"] as? [String: AnyObject],
-                        let results = query["results"] as? [String: AnyObject],
-                        let subscribers = results["b"] as? [String],
-                        subscribers.count > 0,
-                        let string = Int(subscribers[0].replacingOccurrences(of: ",", with: ""))?.stringInDecimal {
-                        completionHandler(.success(string))
-                    } else {
-                        completionHandler(.failure(Error.stuckSubError))
-                        print("WrongDataFormat")
-                    }
-                case let .failure(error):
-                    print(error)
-                    completionHandler(.failure(Error.stuckSubError))
-                }
-            })
-        }
     }
     
     static func idForName(_ name: String, completionHandler: @escaping (Result<String>) -> Void ){
@@ -119,17 +88,22 @@ public struct YoutubeAPI {
     static func jsonSerialization(_ url: URL, completionHandler: @escaping (Result<[String: AnyObject]>) -> Void) {
         let task = URLSession.shared.dataTask(with: url, completionHandler: { (data, response, error) -> Void in
             do {
+                print("before json")
                 if let myData = data, let result = try JSONSerialization.jsonObject(with: myData, options: JSONSerialization.ReadingOptions.allowFragments) as? [String: AnyObject] {
+                    print("ok")
                     completionHandler(.success(result))
                 } else {
                     completionHandler(.failure(Error.jsonError))
+                    print("nope1")
                 }
             } catch {
                 completionHandler(.failure(Error.jsonError))
+                print("nope2")
             }
         })
         task.resume()
     }
+    
     static func fetchYoutubeData(forID id: String, parameters: [DataParameters], completionHandler: @escaping (Result<[String: Any]>) -> Void) {
         var subscriberDictionary = [String: Any]()
         var part = ["statistics"]
@@ -175,15 +149,18 @@ public struct YoutubeAPI {
         idForName(forName, completionHandler: { idResult -> Void in
             switch idResult {
             case let .success(id):
-                parseData(forID: id, parameters: [.data, .photo, .stuckSubscriberCount], completionHandler: { dataResult -> Void in
+                fetchYoutubeData(forID: id, parameters: [.photo, .data], completionHandler: { dataResult -> Void in
                     switch dataResult {
                     case let .success(result):
-                        completionHandler(.success(result))
-                    case let .failure(error):
-                        switch error {
-                        case Error.jsonError: completionHandler(.failure(error))
-                        default: completionHandler(.failure(Error.constructingError))
+                        var subscriberDictionary = result
+                        subscriberDictionary["id"] = id
+                        if subscriberDictionary.count != 6  {
+                            completionHandler(.failure(Error.constructingError))
+                        } else {
+                            completionHandler(.success(subscriberDictionary))
                         }
+                    case let .failure(error):
+                        completionHandler(.failure(error))
                     }
                 })
             case let .failure(error):
@@ -194,42 +171,5 @@ public struct YoutubeAPI {
                 }
             }
         })
-    }
-    public static func parseData(forID id: String, parameters: [DataParameters], completionHandler: @escaping (Result<[String: Any]>) -> Void) {
-        var subscriberDictionary = [String: Any]()
-        let group = DispatchGroup()
-        if parameters.contains(.data) {
-            group.enter()
-            fetchYoutubeData(forID: id, parameters: parameters, completionHandler: { dataResult -> Void in
-                switch dataResult {
-                case let .success(result): subscriberDictionary.merge(result)
-                case let .failure(error): print(error)
-                }
-                group.leave()
-            })
-        }
-        if parameters.contains(.stuckSubscriberCount) {
-            group.enter()
-            stuckSubscriberCountForId(id, completionHandler: { subsResult -> Void in
-                switch subsResult {
-                case let .success(result): subscriberDictionary["stuckSubscriberCount"] = result
-                case let .failure(error): print(error)
-                }
-                group.leave()
-            })
-        }
-        group.notify(queue: DispatchQueue.main) {
-            subscriberDictionary["id"] = id
-            if subscriberDictionary["stuckSubscriberCount"] == nil && parameters.count == 3{
-                if let live = subscriberDictionary["liveSubscriberCount"] as? String {
-                    subscriberDictionary["stuckSubscriberCount"] = live
-                }
-            }
-            if parameters.count == 3 && subscriberDictionary.count != 7 {
-                completionHandler(.failure(Error.constructingError))
-            } else {
-                completionHandler(.success(subscriberDictionary))
-            }
-        }
     }
 }

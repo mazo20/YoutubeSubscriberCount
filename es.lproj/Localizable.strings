@@ -6,10 +6,12 @@
   Copyright © 2016 Maciej Kowalski. All rights reserved.
 */
 
-"FirstThreeChannels" = "Primeros tres canales se presentarán en un widget";
+"FirstThreeChannels" = "Los primeros tres canales se presentarán en un widget";
 "RateOnAppstore" = "Reseñar en AppStore";
 "SuggestNewFunction" = "Sugerir nueva función";
 "ReportABug" = "Reportar un error";
-"AppVersion" = "Version de aplicacion";
+"AppVersion" = "Version de aplicación";
 "ShareYourOpinionWithOthers" = "Comparte tu opinión con otras personas";
 "ShareYourOpinionWithTheDeveloper" = "Comparte tu opinión con el desarrollador";
+"Edit" = "Editar";
+"Done" = "Terminar";
