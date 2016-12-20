@@ -12,6 +12,4 @@ class SubscriberCell: UITableViewCell {
     
     @IBOutlet var thumbnailImageView: UIImageView! 
     @IBOutlet var channelName: UILabel!
-    
-    
 }

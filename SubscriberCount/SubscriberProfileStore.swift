@@ -31,7 +31,7 @@ class SubscriberProfileStore: NSObject {
         var images = [Data]()
         var subs = [String]()
         var size = store.count
-        if size > 3 { size = 3 }
+        if size > 5 { size = 5 }
         for i in 0..<size {
             let profile = store[i]
             names.append(profile.channelName)
@@ -47,5 +47,12 @@ class SubscriberProfileStore: NSObject {
             
         }
         return NSKeyedArchiver.archiveRootObject(store, toFile: profilesArchiveURL.path)
+    }
+    
+    func moveProfile(_ fromIndex: Int, toIndex: Int) {
+        guard fromIndex != toIndex else { return }
+        let profile = store[fromIndex]
+        store.remove(at: fromIndex)
+        store.insert(profile, at: toIndex)
     }
 }

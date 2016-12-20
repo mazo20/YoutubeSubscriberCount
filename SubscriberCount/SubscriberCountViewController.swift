@@ -14,18 +14,10 @@ public struct Public {
     static var id = "UC-lHJZR3Gqxm24_Vd_AJ5Yw"
 }
 
-class SubscriberCountViewController: UIViewController{
+class SubscriberCountViewController: UIViewController {
     
-    var store: SubscriberProfileStore!
-    var showNewProfile = true
-    var idStore: [String: String] {
-        if let store = UserDefaults.standard.object(forKey: "idStore") as? [String: String] {
-            return store
-        } else {
-            return [String: String]()
-        }
-    }
-    
+    @IBOutlet var statsStackView: UIStackView!
+    @IBOutlet var thumbnailStackView: UIStackView!
     @IBOutlet var thumbnailImageView: UIImageView!
     @IBOutlet var channelNameLabel: UILabel!
     @IBOutlet var liveSubscriberCountLabel: UILabel!
@@ -45,6 +37,15 @@ class SubscriberCountViewController: UIViewController{
     var name = ""
     var peekID: String?
     var textFieldShouldBecomeFirstResponder = false
+    var store: SubscriberProfileStore!
+    var showNewProfile = true
+    var idStore: [String: String] {
+        if let store = UserDefaults.standard.object(forKey: "idStore") as? [String: String] {
+            return store
+        } else {
+            return [String: String]()
+        }
+    }
     
     override func restoreUserActivityState(_ activity: NSUserActivity) {
         if activity.activityType == CSSearchableItemActionType {
@@ -52,15 +53,12 @@ class SubscriberCountViewController: UIViewController{
                 let selectedProfile = userInfo[CSSearchableItemActivityIdentifier] as! String
                 name = selectedProfile
                 newProfile(withName: name)
-                print(selectedProfile)
             }
         }
     }
     
     override func viewDidLoad() {
-        if textFieldShouldBecomeFirstResponder {
-            searchTextField.becomeFirstResponder()
-        }
+        if textFieldShouldBecomeFirstResponder { searchTextField.becomeFirstResponder() }
         stackView.isHidden = true
         
         self.navigationController?.navigationBar.backgroundColor = UIColor.clear
@@ -78,7 +76,6 @@ class SubscriberCountViewController: UIViewController{
         let width = sqrt(self.view.bounds.size.width)*3.05
         var frame = CGRect(origin: CGPoint.zero, size: CGSize(width: width, height: width))
         
-        
         loadingAnimation = NVActivityIndicatorView(frame: frame, type: .ballPulse, color: UIColor.black, padding: nil)
         loadingAnimation.center = self.view.center
         self.view.addSubview(loadingAnimation)
@@ -92,10 +89,10 @@ class SubscriberCountViewController: UIViewController{
         repeatButton.setImage(UIImage(imageLiteralResourceName: "Synchronize.png"), for: UIControlState())
         self.view.addSubview(repeatButton)
         
-        frame = CGRect(origin: CGPoint.zero, size: CGSize(width: self.view.bounds.size.width, height: 100))
+        frame = CGRect(origin: CGPoint.zero, size: CGSize(width: self.view.bounds.size.width, height: 150))
         repeatLabel = UILabel(frame: frame)
         repeatLabel.text = "Oops!\nSomething went wrong"
-        let fontSize = self.view.bounds.size.width/15
+        let fontSize = self.view.bounds.size.width/18
         repeatLabel.font = repeatLabel.font.withSize(fontSize)
         repeatLabel.numberOfLines = 3
         repeatLabel.center = self.view.center
@@ -103,7 +100,7 @@ class SubscriberCountViewController: UIViewController{
         repeatLabel.textAlignment = .center
         self.view.addSubview(repeatLabel)
         noIDLabel = UILabel(frame: frame)
-        noIDLabel.text = "No channel found!\nSearch for something else"
+        noIDLabel.text = "Channel not found!\nSearch for something else"
         noIDLabel.font = noIDLabel.font.withSize(fontSize)
         noIDLabel.numberOfLines = 3
         noIDLabel.center = self.view.center
@@ -118,20 +115,26 @@ class SubscriberCountViewController: UIViewController{
         
         visualEffect.frame = self.view.bounds
         visualEffect.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        visualEffect.effect = UIBlurEffect(style: UIBlurEffectStyle.light)
         imageView.contentMode = .scaleAspectFill
+        imageView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         imageView.bounds = self.view.bounds
         imageView.center = self.view.center
         self.view.addSubview(imageView)
         self.view.addSubview(visualEffect)
         self.view.sendSubview(toBack: visualEffect)
         self.view.sendSubview(toBack: imageView)
-        visualEffect.effect = UIBlurEffect(style: UIBlurEffectStyle.light)
+        
+        liveSubscriberCountLabel.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        channelNameLabel.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         
         thumbnailImageView.frame.size = CGSize(width: self.view.bounds.size.width/3, height: self.view.bounds.size.width/3)
         thumbnailImageView.layer.cornerRadius = 10
         thumbnailImageView.layer.borderWidth = 1
         thumbnailImageView.layer.borderColor = UIColor.black.cgColor
         thumbnailImageView.clipsToBounds = true
+        
+        updateViewWhenRotating(size: self.view.frame.size)
         
         if showNewProfile {
             if peekID != nil {
@@ -142,13 +145,71 @@ class SubscriberCountViewController: UIViewController{
                 name = Public.id
             }
             newProfile(withName: name)
-            print("newprofilecalled")
         }
+    
+        rateMe()
+    }
+    
+    func rateMe() {
+        let minSessions = 7
+        var tryAgainSessions = 10
+        let neverRate = UserDefaults.standard.value(forKey: "neverRate") as! Bool
+        if let numTryAgains = UserDefaults.standard.value(forKey: "numTryAgains") as? Int {
+            tryAgainSessions*=numTryAgains
+        } else {
+            UserDefaults.standard.setValue(1, forKey: "numTryAgains")
+        }
+        var numLaunches = (UserDefaults.standard.value(forKey: "numLaunches") as! Int) + 1
+        
+        if (!neverRate && (numLaunches == minSessions || numLaunches >= (minSessions + tryAgainSessions + 1)))
+        {
+            let _ = Timer.scheduledTimer(timeInterval: 15, target: self, selector: #selector(self.showRateMe), userInfo: nil, repeats: false)
+            numLaunches = minSessions + 1
+        }
+        UserDefaults.standard.setValue(numLaunches, forKey: "numLaunches")
+    }
+    
+    func showRateMe() {
+        let alert = UIAlertController(title: "Rate Subtracker", message: "If you enjoy using Subtracker, would you mind taking a moment to rate it? Thanks for your support!", preferredStyle: UIAlertControllerStyle.alert)
+        alert.addAction(UIAlertAction(title: "Rate Subtracker", style: UIAlertActionStyle.cancel, handler: { alertAction in
+            UIApplication.shared.open(URL(string: "https://itunes.apple.com/us/app/subtracker-youtube-live-subscriber/id1156805104?mt=8")!, options: [:], completionHandler: nil)
+            alert.dismiss(animated: true)
+        }))
+        
+        alert.addAction(UIAlertAction(title: "No Thanks", style: UIAlertActionStyle.default, handler: { alertAction in
+            UserDefaults.standard.set(true, forKey: "neverRate")
+            alert.dismiss(animated: true)
+        }))
+        alert.addAction(UIAlertAction(title: "Maybe Later", style: UIAlertActionStyle.default, handler: { alertAction in
+            UserDefaults.standard.set((UserDefaults.standard.value(forKey: "numTryAgains") as! Int) + 1,forKey: "numTryAgains")
+            alert.dismiss(animated: true)
+        }))
+        
+        self.present(alert, animated: true)
+    }
+    
+    func updateViewWhenRotating(size: CGSize) {
+        if size.width > size.height {
+            statsStackView.isHidden = true
+            thumbnailStackView.isHidden = true
+            searchTextField.isHidden = true
+            self.navigationController?.navigationBar.isHidden = true
+            stackView.distribution = .fillProportionally
+        } else {
+            statsStackView.isHidden = false
+            thumbnailStackView.isHidden = false
+            searchTextField.isHidden = false
+            self.navigationController?.navigationBar.isHidden = false
+            stackView.distribution = .equalSpacing
+        }
+    }
+    
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        updateViewWhenRotating(size: size)
     }
     
     override func viewWillAppear(_ animated: Bool) {
         updateBookmark()
-        
     }
     
     @IBAction func tapGestureRecognizer(_ sender: AnyObject) {
@@ -159,15 +220,12 @@ class SubscriberCountViewController: UIViewController{
         guard !self.stackView.isHidden else { return }
         let firstActivityItem = "\(self.channelNameLabel.text!) subscriber count is \(self.liveSubscriberCountLabel.text!) - via SubTracker. Download at http://tinyurl.com/hljn24l"
         
-        
-        
-        
         let window = UIApplication.shared.delegate!.window!!
+        
         UIGraphicsBeginImageContextWithOptions(window.bounds.size, false, 0)
         window.drawHierarchy(in: window.bounds, afterScreenUpdates: true)
         let windowImage = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
-        //now position the image x/y away from the top-left corner to get the portion we want
         
         var size = self.stackView.frame.size
         size.height+=40
@@ -175,9 +233,8 @@ class SubscriberCountViewController: UIViewController{
         
         UIGraphicsBeginImageContextWithOptions(size, false, 0)
         windowImage?.draw(at: CGPoint(x: -self.stackView.frame.origin.x+10, y: -self.stackView.frame.origin.y+20))
-        let image: UIImage = UIGraphicsGetImageFromCurrentImageContext()!
+        let secondActivityItem: UIImage = UIGraphicsGetImageFromCurrentImageContext()!
         UIGraphicsEndImageContext()
-        let secondActivityItem = image
         
         let activityViewController = UIActivityViewController(activityItems: [firstActivityItem, secondActivityItem], applicationActivities: nil)
         activityViewController.popoverPresentationController?.sourceView = sender.view
@@ -247,7 +304,6 @@ class SubscriberCountViewController: UIViewController{
     }
     
     func newProfile(withName name: String) {
-        print("newprofile")
         self.name = name
         timer?.invalidate()
         timer = nil
@@ -261,10 +317,11 @@ class SubscriberCountViewController: UIViewController{
         YoutubeAPI.parseProfile(forName: newName, completionHandler: { result -> Void in
             switch result {
             case let .success(result):
-                print("success")
                 DispatchQueue.main.async {
                     let subscriberDictionary = result as! [String: AnyObject]
+                    Public.id = subscriberDictionary["id"] as! String
                     self.updateView(withValues: subscriberDictionary)
+                    
                     
                     if newName != subscriberDictionary["id"] as! String {
                         var store = self.idStore
@@ -281,15 +338,11 @@ class SubscriberCountViewController: UIViewController{
                     searchableItemAttributeSet.title = (subscriberDictionary["channelName"] as! String)
                     let data = NSData(data: UIImagePNGRepresentation(subscriberDictionary["image"] as! UIImage)!) as Data
                     searchableItemAttributeSet.thumbnailData = data
-                    let keywords = subscriberDictionary["channelName"] as! String
-                    searchableItemAttributeSet.keywords =
-                        keywords.components(separatedBy: " ")
+                    searchableItemAttributeSet.keywords = [subscriberDictionary["channelName"] as! String, name]
+                    
                     let searchableItem = CSSearchableItem(uniqueIdentifier: (subscriberDictionary["id"] as! String), domainIdentifier: "channels", attributeSet: searchableItemAttributeSet)
-                    CSSearchableIndex.default().indexSearchableItems([searchableItem], completionHandler: { (ErrorType) -> Void in
-                        if (ErrorType != nil) {
-                            print("indexing failed \(ErrorType)")
-                        }
-                    })
+                    CSSearchableIndex.default().indexSearchableItems([searchableItem], completionHandler: nil)
+                    
                     var timer = 2.0
                     let subCount = subscriberDictionary["liveSubscriberCount"] as! String
                     if subCount.characters.count < 3 {
@@ -305,11 +358,12 @@ class SubscriberCountViewController: UIViewController{
                     }
                     
                     self.stackView.isHidden = false
-                    Public.id = subscriberDictionary["id"] as! String
                     self.updateBookmark()
+                    
                     if self.peekID == nil {
                         self.timer = Timer.scheduledTimer(timeInterval: timer, target: self, selector: #selector(self.updateLiveSubscriberCount), userInfo: nil, repeats: true)
                     }
+                    
                     
                     self.loadingAnimation.stopAnimation()
                 }
@@ -324,18 +378,17 @@ class SubscriberCountViewController: UIViewController{
     }
     
     func updateLiveSubscriberCount() {
-        print(Date())
-        print(channelNameLabel.text!)
-        YoutubeAPI.fetchYoutubeData(forID: Public.id, parameters: [.data], completionHandler: { result -> Void in
-            switch result {
-            case let .success(result): self.updateView(withValues: result)
-            case let .failure(error): print(error)
+        YoutubeAPI.fetchYoutubeData(forID: Public.id, parameters: ["statistics"], completionHandler: { result -> Void in
+            DispatchQueue.main.async {
+                self.updateView(withValues: result)
             }
         })
     }
     
     func updateView(withValues values: [String: Any]) {
-        print("update")
+        if let id = values["id"] as? String {
+            guard Public.id == id else { return }
+        }
         if let channel = values["channelName"] as? String  { self.channelNameLabel.text = channel }
         if let liveSubCount = values["liveSubscriberCount"] as? String { self.liveSubscriberCountLabel.text = liveSubCount }
         if let views = values["viewCount"] as? String { self.viewsCountLabel.text = views }

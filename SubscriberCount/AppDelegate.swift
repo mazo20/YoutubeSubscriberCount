@@ -40,13 +40,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
         
-        
+        let defaults = UserDefaults(suiteName: "group.subscriberProfiles")
+        if defaults?.value(forKey: "timesUsed") == nil {
+            defaults?.set(0, forKey: "timesUsed")
+        }
+        if UserDefaults.standard.value(forKey: "neverRate") == nil {
+            UserDefaults.standard.set(false, forKey: "neverRate")
+            UserDefaults.standard.set(0, forKey: "numLaunches")
+        }
         
         var performShortcutDelegate = true
         if let shortcutItem = launchOptions?[UIApplicationLaunchOptionsKey.shortcutItem] as? UIApplicationShortcutItem {
-            print("Application launched via shortcut")
             self.shortcutItem = shortcutItem
             performShortcutDelegate = false
         }
@@ -54,8 +59,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             _ = self.application(application, open: url, options: [:])
         }
         
-        let navController = window?.rootViewController as! UINavigationController
-        let subViewController = navController.topViewController as! SubscriberCountViewController
+        let subViewController = (window?.rootViewController as! UINavigationController).topViewController as! SubscriberCountViewController
         subViewController.store = store
         if let url = launchOptions?[UIApplicationLaunchOptionsKey.url] as? URL {
             _ = self.application(application, open: url, options: [:])
@@ -104,7 +108,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillEnterForeground(_ application: UIApplication) {
         // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
         var size = store.store.count
-        if size >= 3 { size = 3 }
+        if size > 3 { size = 3 }
         for i in 0..<size {
             let defaults = UserDefaults(suiteName: "group.subscriberProfiles")
             let subs = defaults?.object(forKey: "subs") as? [String]
@@ -119,21 +123,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func applicationDidBecomeActive(_ application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
-        print("Application did become active")
         
         guard let shortcut = shortcutItem else { return }
-        
-        print("- Shortcut property has been set")
-        
         _ = handleShortcut(shortcut)
-        
         self.shortcutItem = nil
     }
 
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
-
-
 }
-

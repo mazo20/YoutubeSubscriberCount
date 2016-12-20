@@ -6,7 +6,7 @@
   Copyright © 2016 Maciej Kowalski. All rights reserved.
 */
 
-"FirstThreeChannels" = "First three channels will be shown in a widget";
+"FirstThreeChannels" = "First five channels will be shown in a widget";
 "RateOnAppstore" = "Rate on Appstore";
 "SuggestNewFunction" = "Suggest new function";
 "ReportABug" = "Report a bug";

@@ -29,40 +29,27 @@ class TodayViewController: UIViewController, NCWidgetProviding {
         
         tableView.allowsSelection = true
         tableView.contentInset.top = -8
-        print("reloadData")
-        self.extensionContext?.widgetLargestAvailableDisplayMode = .expanded
         
-        // Do any additional setup after loading the view from its nib.
+        self.extensionContext?.widgetLargestAvailableDisplayMode = .expanded
     }
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
     }
     
     func widgetPerformUpdate(completionHandler: (@escaping (NCUpdateResult) -> Void)) {
-        // Perform any setup necessary in order to update the view.
-        
-        // If an error is encountered, use NCUpdateResult.Failed
-        // If there's no update required, use NCUpdateResult.NoData
-        // If there's an update, use NCUpdateResult.NewData
-        
-        
-        print("widget")
-        
+        incrementUsageCount(1)
         completionHandler(NCUpdateResult.newData)
     }
+    
     func widgetActiveDisplayModeDidChange(_ activeDisplayMode: NCWidgetDisplayMode, withMaximumSize maxSize: CGSize) {
         if activeDisplayMode == .compact {
             self.preferredContentSize = CGSize(width: 0, height: 95)
-            //self.tableView.separatorStyle = .none
         } else {
-            let count = names?.count
-            if let count = count {
-                self.preferredContentSize = CGSize(width: 0, height: count * 100)
-            } else {
+            guard let count = names?.count else {
                 self.preferredContentSize = tableView.contentSize
+                return
             }
-            //self.tableView.separatorStyle = .singleLine
+            self.preferredContentSize = CGSize(width: 0, height: count * 100)
         }
     }
     func widgetMarginInsets(forProposedMarginInsets defaultMarginInsets: UIEdgeInsets) -> UIEdgeInsets {
@@ -75,16 +62,13 @@ class TodayViewController: UIViewController, NCWidgetProviding {
 extension TodayViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if let count = names?.count, count != 0 {
-            return count
-        }
-        return 1
+        return names?.count == nil ? 1 : names!.count
     }
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         self.preferredContentSize = tableView.contentSize
         let cell = tableView.dequeueReusableCell(withIdentifier: "SubscriberCell", for: indexPath) as! SubscriberCell
-        if images?.count == 0 {
-            cell.channelName.text = "Setup required"
+        guard let _ = images else {
+            cell.channelName.text = "Bookmark required"
             return cell
         }
         if let photo = images?[indexPath.row] {
@@ -93,37 +77,25 @@ extension TodayViewController: UITableViewDelegate, UITableViewDataSource {
             cell.thumbnailImageView.layer.cornerRadius = 5
             cell.thumbnailImageView.clipsToBounds = true
         }
-        if let subs = subs?[indexPath.row] {
-            cell.subscriberCount.text = subs
-        }
-        if let name = names?[indexPath.row] {
-            cell.channelName.text = name
-            print(name)
-        }
+        if let subs = subs?[indexPath.row] { cell.subscriberCount.text = subs }
+        if let name = names?[indexPath.row] { cell.channelName.text = name }
         if let id = ids?[indexPath.row] {
-            print(id)
-            YoutubeAPI.fetchYoutubeData(forID: id, parameters: [.data], completionHandler: { result -> Void in
-                switch result {
-                case let .success(result):
-                    let dict = result
-                    guard let sub = dict["liveSubscriberCount"] as? String else { return }
-                    cell.subscriberCount.text = sub
-                    self.subs?[indexPath.row] = sub
-                    self.defaults?.setValue(self.subs, forKey: "subs")
-                case let .failure(error):
-                    print(error)
-                }
+            YoutubeAPI.fetchYoutubeData(forID: id, parameters: ["statistics"], completionHandler: { result -> Void in
+                let dict = result
+                guard let sub = dict["liveSubscriberCount"] as? String else { return }
+                cell.subscriberCount.text = sub
+                self.subs?[indexPath.row] = sub
+                self.defaults?.setValue(self.subs, forKey: "subs")
             })
         }
-        
-        
         return cell
     }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        guard let _ = names else { return }
         let url = URL(string: "SubTracker:/\(ids![indexPath.row])")
-        print(indexPath.row)
         self.extensionContext?.open(url!, completionHandler: nil)
     }
+    
     func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
         return 0.00001
     }

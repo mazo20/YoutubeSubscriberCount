@@ -26,7 +26,7 @@ class AboutViewController: UITableViewController, MFMailComposeViewControllerDel
         cell.detailTextLabel?.font = UIFont.preferredFont(forTextStyle: UIFontTextStyle.body)
         cell.textLabel?.font = UIFont.preferredFont(forTextStyle: UIFontTextStyle.body)
         
-        switch (indexPath as NSIndexPath).section {
+        switch indexPath.section {
         case 0:
             cell.textLabel?.text = NSLocalizedString("RateOnAppstore", comment: "Rate on Appstore")
             cell.accessoryType = .disclosureIndicator
@@ -58,21 +58,21 @@ class AboutViewController: UITableViewController, MFMailComposeViewControllerDel
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if (indexPath as NSIndexPath).section == 0 {
-            UIApplication.shared.openURL(URL(string: "https://itunes.apple.com/us/app/subtracker-youtube-live-subscriber/id1156805104?mt=8")!)
-        } else if indexPath.section == 2 {
+        if indexPath.section == 0 {
+            UserDefaults.standard.set(true, forKey: "neverRate")
+            UserDefaults.standard.setValue(4, forKey: "numLaunches")
+            UIApplication.shared.open(URL(string: "https://itunes.apple.com/us/app/subtracker-youtube-live-subscriber/id1156805104?mt=8")!, options: [:], completionHandler: nil)
             
-        } else {
+        } else if indexPath.section == 1{
             let email = MFMailComposeViewController()
             email.mailComposeDelegate = self
             email.setMessageBody("\n\n\n-----------------\nApp version: \(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString")!)\niOS version: \(UIDevice.current.systemVersion)", isHTML: false)
-            if (indexPath as NSIndexPath).row == 0 {
+            if indexPath.row == 0 {
                 email.setSubject("New function")
             } else {
                 email.setSubject("Bug report")
             }
-            email.setToRecipients(["maciej.kowalski.developer@gmail.com"]) // the recipient email address
-            //email.preferredStatusBarStyle
+            email.setToRecipients(["maciej.kowalski.developer@gmail.com"])
             
             if MFMailComposeViewController.canSendMail() {
                 self.present(email, animated: true, completion: nil)
