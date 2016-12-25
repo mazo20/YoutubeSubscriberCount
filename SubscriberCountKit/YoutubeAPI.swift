@@ -36,13 +36,6 @@ extension String {
     }
 }
 
-public func incrementUsageCount(_ value: Int) {
-    let defaults = UserDefaults(suiteName: "group.subscriberProfiles")
-    var timesUsed = defaults?.value(forKey: "timesUsed") as! Int
-    timesUsed+=value
-    defaults?.set(timesUsed, forKey: "timesUsed")
-}
-
 public struct YoutubeAPI {
     fileprivate static let baseURLString = "https://www.googleapis.com/youtube/v3/"
     fileprivate static let APIKey = "AIzaSyBKoz_46nVMrkdZqYmgs-q2uhu81AEKEoc"

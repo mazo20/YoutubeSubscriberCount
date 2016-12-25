@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		524D1881DC6E08D844B656D8 /* Pods_SubscriberCount.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BE9B3F8E7C75CE55035B306C /* Pods_SubscriberCount.framework */; };
-		542366C01D7AFA1C00B823E4 /* Synchronize.png in Resources */ = {isa = PBXBuildFile; fileRef = 542366BF1D7AFA1C00B823E4 /* Synchronize.png */; };
 		542726DE1DCA5A7D0058C6E0 /* LaunchIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 542726DD1DCA5A7D0058C6E0 /* LaunchIcon.png */; };
 		54427DF81D8491A2002B5EBC /* NotificationCenter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 54427DF71D8491A2002B5EBC /* NotificationCenter.framework */; };
 		54427DFB1D8491A2002B5EBC /* TodayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54427DFA1D8491A2002B5EBC /* TodayViewController.swift */; };
@@ -125,7 +124,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		542366BF1D7AFA1C00B823E4 /* Synchronize.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Synchronize.png; sourceTree = "<group>"; };
 		542726D81DCA592C0058C6E0 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		542726DA1DCA59310058C6E0 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		542726DC1DCA59330058C6E0 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
@@ -350,7 +348,6 @@
 				548890381D75A76F00C69B72 /* VideoCallIcon.png */,
 				5488903A1D75A76F00C69B72 /* EyeIcon.png */,
 				5488903C1D75A76F00C69B72 /* YouTubeIcon.png */,
-				542366BF1D7AFA1C00B823E4 /* Synchronize.png */,
 				54B003041D90482300A491F2 /* AppIcon */,
 			);
 			name = OtherIcons;
@@ -551,7 +548,6 @@
 				5488903E1D75A76F00C69B72 /* VideoCallIcon.png in Resources */,
 				54B0031E1D90491C00A491F2 /* icon40@2x.png in Resources */,
 				54B0031B1D90485200A491F2 /* icon29@1x.png in Resources */,
-				542366C01D7AFA1C00B823E4 /* Synchronize.png in Resources */,
 				54B003171D90485200A491F2 /* icon20@2x.png in Resources */,
 				54B0031A1D90485200A491F2 /* icon20@1x.png in Resources */,
 				548890121D755EA300C69B72 /* Main.storyboard in Resources */,

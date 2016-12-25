@@ -41,10 +41,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         
-        let defaults = UserDefaults(suiteName: "group.subscriberProfiles")
-        if defaults?.value(forKey: "timesUsed") == nil {
-            defaults?.set(0, forKey: "timesUsed")
-        }
         if UserDefaults.standard.value(forKey: "neverRate") == nil {
             UserDefaults.standard.set(false, forKey: "neverRate")
             UserDefaults.standard.set(0, forKey: "numLaunches")

@@ -37,7 +37,6 @@ class TodayViewController: UIViewController, NCWidgetProviding {
     }
     
     func widgetPerformUpdate(completionHandler: (@escaping (NCUpdateResult) -> Void)) {
-        incrementUsageCount(1)
         completionHandler(NCUpdateResult.newData)
     }
     

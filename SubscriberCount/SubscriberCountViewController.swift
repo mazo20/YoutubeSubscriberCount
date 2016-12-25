@@ -86,7 +86,7 @@ class SubscriberCountViewController: UIViewController {
         repeatButton.addTarget(self, action: #selector(self.update), for: .touchUpInside)
         repeatButton.center = self.view.center
         repeatButton.center.y+=self.view.bounds.size.width/3
-        repeatButton.setImage(UIImage(imageLiteralResourceName: "Synchronize.png"), for: UIControlState())
+        repeatButton.setImage(#imageLiteral(resourceName: "Synchronize"), for: UIControlState())
         self.view.addSubview(repeatButton)
         
         frame = CGRect(origin: CGPoint.zero, size: CGSize(width: self.view.bounds.size.width, height: 150))
@@ -264,19 +264,21 @@ class SubscriberCountViewController: UIViewController {
         let profileInStore = self.store.store.filter{$0.id == Public.id}.first
         if let profileInStore = profileInStore {
             if changeState == nil {
-                self.bookmarkButton.image = UIImage(imageLiteralResourceName: "BookmarkFilled.png")
+                self.bookmarkButton.image = #imageLiteral(resourceName: "BookmarkFilled")
             } else {
-                let index = self.store.store.index(of: profileInStore)
-                self.store.store.remove(at: index!)
-                self.bookmarkButton.image = UIImage(imageLiteralResourceName: "Bookmark.png")
+                if let index = self.store.store.index(of: profileInStore) {
+                    self.store.store.remove(at: index)
+                }
+                
+                self.bookmarkButton.image = #imageLiteral(resourceName: "Bookmark")
             }
         } else {
             if changeState == nil {
-                self.bookmarkButton.image = UIImage(imageLiteralResourceName: "Bookmark.png")
+                self.bookmarkButton.image = #imageLiteral(resourceName: "Bookmark")
             } else {
                 let subscriberProfile = SubscriberProfile(image: self.thumbnailImageView.image!, channelName: self.channelNameLabel.text!, id: Public.id, subscriberCount: self.liveSubscriberCountLabel.text!)
                 self.store.store.append(subscriberProfile)
-                self.bookmarkButton.image = UIImage(imageLiteralResourceName: "BookmarkFilled.png")
+                self.bookmarkButton.image = #imageLiteral(resourceName: "BookmarkFilled")
             }
         }
     }
