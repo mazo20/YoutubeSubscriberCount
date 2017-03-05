@@ -73,6 +73,9 @@ public struct YoutubeAPI {
                     let items = JSON["items"] as? [[String:AnyObject]] , items.count > 0,
                     let snippet = items[0]["snippet"] as? NSDictionary,
                     let id = snippet["channelId"] as? String {
+                    for items in snippet {
+                        dump(items)
+                    }
                     completionHandler(.success(id))
                 } else {
                     completionHandler(.failure(Error.idError))

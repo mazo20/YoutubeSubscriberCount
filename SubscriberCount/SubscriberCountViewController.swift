@@ -9,9 +9,23 @@
 import UIKit
 import CoreSpotlight
 import MobileCoreServices
+import OnboardingKit
+import UICountingLabel
 
 public struct Public {
     static var id = "UC-lHJZR3Gqxm24_Vd_AJ5Yw"
+}
+
+extension UIView {
+    func pushTransition(duration:CFTimeInterval) {
+        let animation:CATransition = CATransition()
+        animation.timingFunction = CAMediaTimingFunction(name:
+            kCAMediaTimingFunctionEaseInEaseOut)
+        animation.type = kCATransitionFade
+        //animation.subtype = kCATransitionFromTop
+        animation.duration = duration
+        self.layer.add(animation, forKey: kCATransitionPush)
+    }
 }
 
 class SubscriberCountViewController: UIViewController {
@@ -20,13 +34,12 @@ class SubscriberCountViewController: UIViewController {
     @IBOutlet var thumbnailStackView: UIStackView!
     @IBOutlet var thumbnailImageView: UIImageView!
     @IBOutlet var channelNameLabel: UILabel!
-    @IBOutlet var liveSubscriberCountLabel: UILabel!
+    @IBOutlet var liveSubscriberCountLabel: UICountingLabel!
     @IBOutlet var videoCountLabel: UILabel!
     @IBOutlet var viewsCountLabel: UILabel!
     @IBOutlet var searchTextField: UITextField!
     @IBOutlet var bookmarkButton: UIBarButtonItem!
     @IBOutlet var stackView: UIStackView!
-    
     let imageView = UIImageView()
     let visualEffect = UIVisualEffectView()
     var loadingAnimation: NVActivityIndicatorView!
@@ -146,8 +159,12 @@ class SubscriberCountViewController: UIViewController {
             }
             newProfile(withName: name)
         }
+        
+        
     
         rateMe()
+        
+        performSegue(withIdentifier: "onboarding", sender: self)
     }
     
     func rateMe() {
@@ -392,7 +409,12 @@ class SubscriberCountViewController: UIViewController {
             guard Public.id == id else { return }
         }
         if let channel = values["channelName"] as? String  { self.channelNameLabel.text = channel }
-        if let liveSubCount = values["liveSubscriberCount"] as? String { self.liveSubscriberCountLabel.text = liveSubCount }
+        if let liveSubCount = values["liveSubscriberCount"] as? String {
+            //self.liveSubscriberCountLabel.format = "%d"
+            //self.liveSubscriberCountLabel.countFromCurrentValue(to: CGFloat(Int(liveSubCount)!), withDuration: 2.0)
+            self.liveSubscriberCountLabel.pushTransition(duration: 0.2)
+            self.liveSubscriberCountLabel.text = liveSubCount
+        }
         if let views = values["viewCount"] as? String { self.viewsCountLabel.text = views }
         if let videos = values["videoCount"] as? String { self.videoCountLabel.text = videos }
         if let image = values["image"] as? UIImage {
@@ -435,3 +457,5 @@ extension SubscriberCountViewController: SendIdDelegate {
         searchTextField.text = ""
     }
 }
+
+
