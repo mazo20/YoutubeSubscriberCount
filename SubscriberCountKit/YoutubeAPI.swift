@@ -68,18 +68,59 @@ public struct YoutubeAPI {
                     completionHandler(.failure(Error.constructingError))
                     return
                 }
+                var IDs = [String]()
                 if let pageInfo = JSON["pageInfo"] as? NSDictionary,
                     let totalResults = pageInfo["totalResults"] as? Int , totalResults > 0,
-                    let items = JSON["items"] as? [[String:AnyObject]] , items.count > 0,
-                    let snippet = items[0]["snippet"] as? NSDictionary,
-                    let id = snippet["channelId"] as? String {
-                    for items in snippet {
-                        dump(items)
+                    let items = JSON["items"] as? [[String:AnyObject]] , items.count > 0 {
+                    for item in items {
+                        if let snippet = item["snippet"] as? NSDictionary,
+                            let id = snippet["channelId"] as? String {
+                            IDs.append(id)
+                        }
                     }
-                    completionHandler(.success(id))
+                    completionHandler(.success(IDs[0]))
                 } else {
                     completionHandler(.failure(Error.idError))
                 }
+            }
+        }
+    }
+    
+    static func fetchIDs(forName name: String, completionHandler: @escaping ([Int: Any]) -> Void ){
+        var subscriberDictionary = [Int: Any]()
+        let url = youtubeURL(method: .Search, part: ["snippet"], parameters: ["q": name, "type": "channel"])
+        Alamofire.request(url).responseJSON { response in
+            guard let JSON = response.result.value as? [String: AnyObject] else {
+                completionHandler(subscriberDictionary)
+                return
+            }
+            var IDs = [String]()
+            if let pageInfo = JSON["pageInfo"] as? NSDictionary,
+                let totalResults = pageInfo["totalResults"] as? Int , totalResults > 0,
+                let items = JSON["items"] as? [[String:AnyObject]] , items.count > 0 {
+                for i in 0..<items.count {
+                    if let snippet = items[i]["snippet"] as? NSDictionary,
+                        let id = snippet["channelId"] as? String {
+                        IDs.append(id)
+                        if let snippet = items[i]["snippet"] as? NSDictionary,
+                            let thumbnails = snippet["thumbnails"] as? NSDictionary,
+                            let image = thumbnails["medium"] as? NSDictionary,
+                            let urlString = image["url"] as? String,
+                            let title = snippet["title"] as? String,
+                            let url = URL(string: urlString),
+                            let imageData = try? Data(contentsOf: url) {
+                            var subscriberProfile = [String: Any]()
+                            subscriberProfile["id"] = id
+                            subscriberProfile["image"] = UIImage(data: imageData)
+                            subscriberProfile["channelName"] = title
+                            subscriberDictionary[i] = subscriberProfile
+                        }
+                    }
+                    
+                }
+                completionHandler(subscriberDictionary)
+            } else {
+                completionHandler(subscriberDictionary)
             }
         }
     }
@@ -115,6 +156,7 @@ public struct YoutubeAPI {
             completionHandler(subscriberDictionary)
         }
     }
+    
     
     public static func parseProfile(forName name: String, completionHandler: @escaping (Result<Any>) -> Void) {
         fetchID(forName: name, completionHandler: { idResult -> Void in

@@ -15,3 +15,7 @@
 "ShareYourOpinionWithTheDeveloper" = "Share your opinion with the developer";
 "Edit" = "Edit";
 "Done" = "Done";
+"NoMoreChannelsFound" = "No more channels found";
+"ChannelNotFound" = "Channel not found!\nSearch for something else";
+"SomethingWentWrong" = "Oops!\nSomething went wrong";
+"EnterChannel" = "Enter channel's name or ID";

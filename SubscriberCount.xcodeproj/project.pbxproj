@@ -46,6 +46,8 @@
 		54B0031C1D90485200A491F2 /* icon76@1x.png in Resources */ = {isa = PBXBuildFile; fileRef = 54B003131D90485200A491F2 /* icon76@1x.png */; };
 		54B0031E1D90491C00A491F2 /* icon40@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 54B0031D1D90491C00A491F2 /* icon40@2x.png */; };
 		54B553551DE1FD9800E2882C /* DZNEmptyDataSet.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 54B553541DE1FD9800E2882C /* DZNEmptyDataSet.framework */; };
+		54CDCED31E7484C300029B7A /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54CDCED21E7484C300029B7A /* SearchViewController.swift */; };
+		54CDCED71E7497CD00029B7A /* SearchCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54CDCED61E7497CD00029B7A /* SearchCell.swift */; };
 		54CEA19A1D84A43100719257 /* SubscriberCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54CEA1991D84A43100719257 /* SubscriberCell.swift */; };
 		54CEA1A01D8595A400719257 /* BookmarkIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 54CEA19F1D8595A400719257 /* BookmarkIcon.png */; };
 		54FA8D2A1D785F4000570D61 /* BookmarksTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54FA8D291D785F4000570D61 /* BookmarksTableViewController.swift */; };
@@ -176,6 +178,8 @@
 		54B003131D90485200A491F2 /* icon76@1x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon76@1x.png"; sourceTree = "<group>"; };
 		54B0031D1D90491C00A491F2 /* icon40@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon40@2x.png"; sourceTree = "<group>"; };
 		54B553541DE1FD9800E2882C /* DZNEmptyDataSet.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DZNEmptyDataSet.framework; path = "../../../../Library/Developer/Xcode/DerivedData/SubscriberCount-czrmonxioogktkarweakuzdhhczc/Build/Products/Debug-iphonesimulator/DZNEmptyDataSet/DZNEmptyDataSet.framework"; sourceTree = "<group>"; };
+		54CDCED21E7484C300029B7A /* SearchViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchViewController.swift; sourceTree = "<group>"; };
+		54CDCED61E7497CD00029B7A /* SearchCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchCell.swift; sourceTree = "<group>"; };
 		54CEA1971D84942400719257 /* SubscriberCount.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = SubscriberCount.entitlements; sourceTree = "<group>"; };
 		54CEA1991D84A43100719257 /* SubscriberCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubscriberCell.swift; sourceTree = "<group>"; };
 		54CEA19F1D8595A400719257 /* BookmarkIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = BookmarkIcon.png; sourceTree = "<group>"; };
@@ -320,6 +324,8 @@
 				54FA8D2D1D787C5900570D61 /* SubscriberProfileStore.swift */,
 				54CEA1A21D867B1800719257 /* YoutubeAPI.swift */,
 				547B3AA31DC775520073DFDF /* AboutViewController.swift */,
+				54CDCED21E7484C300029B7A /* SearchViewController.swift */,
+				54CDCED61E7497CD00029B7A /* SearchCell.swift */,
 				548890101D755EA300C69B72 /* Main.storyboard */,
 				548890151D755EA300C69B72 /* LaunchScreen.storyboard */,
 				54FA8D421D78BAD900570D61 /* NVActivityIndicatorView */,
@@ -660,6 +666,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				54FA8D7C1D78BAD900570D61 /* NVActivityIndicatorAnimationBallZigZag.swift in Sources */,
+				54CDCED71E7497CD00029B7A /* SearchCell.swift in Sources */,
 				54FA8D7E1D78BAD900570D61 /* NVActivityIndicatorAnimationBlank.swift in Sources */,
 				547B3AA41DC775520073DFDF /* AboutViewController.swift in Sources */,
 				54FA8D8C1D78BAD900570D61 /* NVActivityIndicatorShape.swift in Sources */,
@@ -695,6 +702,7 @@
 				54FA8D7F1D78BAD900570D61 /* NVActivityIndicatorAnimationCubeTransition.swift in Sources */,
 				54FA8D751D78BAD900570D61 /* NVActivityIndicatorAnimationBallRotateChase.swift in Sources */,
 				54FA8D8E1D78BAD900570D61 /* NVActivityIndicatorViewable.swift in Sources */,
+				54CDCED31E7484C300029B7A /* SearchViewController.swift in Sources */,
 				548890211D7562CD00C69B72 /* SubscriberCountViewController.swift in Sources */,
 				54FA8D781D78BAD900570D61 /* NVActivityIndicatorAnimationBallScaleRipple.swift in Sources */,
 				54FA8D861D78BAD900570D61 /* NVActivityIndicatorAnimationPacman.swift in Sources */,

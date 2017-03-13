@@ -37,7 +37,6 @@ class SubscriberCountViewController: UIViewController {
     @IBOutlet var liveSubscriberCountLabel: UICountingLabel!
     @IBOutlet var videoCountLabel: UILabel!
     @IBOutlet var viewsCountLabel: UILabel!
-    @IBOutlet var searchTextField: UITextField!
     @IBOutlet var bookmarkButton: UIBarButtonItem!
     @IBOutlet var stackView: UIStackView!
     let imageView = UIImageView()
@@ -70,8 +69,11 @@ class SubscriberCountViewController: UIViewController {
         }
     }
     
+    func searchTextFieldBecomeFirstResponder() {
+        self.performSegue(withIdentifier: "Search", sender: self)
+    }
+    
     override func viewDidLoad() {
-        if textFieldShouldBecomeFirstResponder { searchTextField.becomeFirstResponder() }
         stackView.isHidden = true
         
         self.navigationController?.navigationBar.backgroundColor = UIColor.clear
@@ -80,11 +82,6 @@ class SubscriberCountViewController: UIViewController {
         self.navigationController?.navigationBar.isTranslucent = true
         self.navigationController?.navigationBar.tintColor = UIColor.black
         
-        searchTextField.delegate = self
-        searchTextField.returnKeyType = .search
-        searchTextField.autocorrectionType = .no
-        searchTextField.clearButtonMode = .whileEditing
-        searchTextField.clearsOnBeginEditing = true
         
         let width = sqrt(self.view.bounds.size.width)*3.05
         var frame = CGRect(origin: CGPoint.zero, size: CGSize(width: width, height: width))
@@ -104,7 +101,8 @@ class SubscriberCountViewController: UIViewController {
         
         frame = CGRect(origin: CGPoint.zero, size: CGSize(width: self.view.bounds.size.width, height: 150))
         repeatLabel = UILabel(frame: frame)
-        repeatLabel.text = "Oops!\nSomething went wrong"
+        repeatLabel.text = NSLocalizedString("SomethingWentWrong", comment: "Oops!\nSomething went wrong")
+        
         let fontSize = self.view.bounds.size.width/18
         repeatLabel.font = repeatLabel.font.withSize(fontSize)
         repeatLabel.numberOfLines = 3
@@ -113,7 +111,7 @@ class SubscriberCountViewController: UIViewController {
         repeatLabel.textAlignment = .center
         self.view.addSubview(repeatLabel)
         noIDLabel = UILabel(frame: frame)
-        noIDLabel.text = "Channel not found!\nSearch for something else"
+        noIDLabel.text = NSLocalizedString("ChannelNotFound", comment: "Channel not found!\nSearch for something else")
         noIDLabel.font = noIDLabel.font.withSize(fontSize)
         noIDLabel.numberOfLines = 3
         noIDLabel.center = self.view.center
@@ -121,10 +119,6 @@ class SubscriberCountViewController: UIViewController {
         self.view.addSubview(noIDLabel)
         
         shouldShowError(false)
-        
-        searchTextField.layer.borderColor = UIColor.black.cgColor
-        searchTextField.layer.borderWidth = 1
-        searchTextField.layer.cornerRadius = 5
         
         visualEffect.frame = self.view.bounds
         visualEffect.autoresizingMask = [.flexibleWidth, .flexibleHeight]
@@ -209,13 +203,11 @@ class SubscriberCountViewController: UIViewController {
         if size.width > size.height {
             statsStackView.isHidden = true
             thumbnailStackView.isHidden = true
-            searchTextField.isHidden = true
             self.navigationController?.navigationBar.isHidden = true
             stackView.distribution = .fillProportionally
         } else {
             statsStackView.isHidden = false
             thumbnailStackView.isHidden = false
-            searchTextField.isHidden = false
             self.navigationController?.navigationBar.isHidden = false
             stackView.distribution = .equalSpacing
         }
@@ -410,8 +402,6 @@ class SubscriberCountViewController: UIViewController {
         }
         if let channel = values["channelName"] as? String  { self.channelNameLabel.text = channel }
         if let liveSubCount = values["liveSubscriberCount"] as? String {
-            //self.liveSubscriberCountLabel.format = "%d"
-            //self.liveSubscriberCountLabel.countFromCurrentValue(to: CGFloat(Int(liveSubCount)!), withDuration: 2.0)
             self.liveSubscriberCountLabel.pushTransition(duration: 0.2)
             self.liveSubscriberCountLabel.text = liveSubCount
         }
@@ -430,23 +420,11 @@ class SubscriberCountViewController: UIViewController {
             bookmarksViewController.store = self.store
             bookmarksViewController.previousProfile = Public.id
             bookmarksViewController.delegate = self
+        } else if segue.identifier == "Search" {
+            let navController = segue.destination as! UINavigationController
+            let searchViewController = navController.topViewController as! SearchViewController
+            searchViewController.delegate = self
         }
-    }
-}
-
-extension SubscriberCountViewController: UITextFieldDelegate {
-    func searchTextFieldBecomeFirstResponder() {
-        if let textField = searchTextField {
-            textField.becomeFirstResponder()
-        }
-        textFieldShouldBecomeFirstResponder = true
-    }
-    
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        textField.resignFirstResponder()
-        name = textField.text!
-        newProfile(withName: name)
-        return false
     }
 }
 
@@ -454,7 +432,6 @@ extension SubscriberCountViewController: SendIdDelegate {
     func sendData(_ data: String) {
         name = data
         newProfile(withName: name)
-        searchTextField.text = ""
     }
 }
 

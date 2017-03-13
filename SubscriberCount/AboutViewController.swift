@@ -57,6 +57,10 @@ class AboutViewController: UITableViewController, MFMailComposeViewControllerDel
         }
     }
     
+    override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
+        return section == 2 ? "If you cannot find a channel by its name go to Youtube and find it's unique channel ID" : ""
+    }
+    
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.section == 0 {
             UserDefaults.standard.set(true, forKey: "neverRate")

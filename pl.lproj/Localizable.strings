@@ -15,3 +15,7 @@
 "ShareYourOpinionWithTheDeveloper" = "Podziel się swoją opinią z deweloperem";
 "Edit" = "Edytuj";
 "Done" = "Gotowe";
+"NoMoreChannelsFound" = "Nie znaleziono więcej kanałów";
+"ChannelNotFound" = "Nie znaleziono kanału!\nWyszukaj ponownie";
+"SomethingWentWrong" = "Ups!\nCoś poszło nie tak";
+"EnterChannel" = "Wyszukaj kanał po nazwie lub ID";
